@@ -4,7 +4,7 @@ export const isAdmin = (role?: string) => {
 
 export const getRedirectPath = (role?: string) => {
     if (role === "ADMIN" || role === "STAFF") {
-        return "/admin/dashboard"
+        return "/dashboard"
     }
     return "/auth/login"
 }

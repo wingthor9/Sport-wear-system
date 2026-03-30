@@ -47,7 +47,7 @@ export const useAuth = () => {
 }
 
 
-// Product
+// -------------------------------------------------------- Product start -----------------------------------------------------------------------
 
 export const useGetProducts = () => {
     return useQuery({
@@ -96,14 +96,24 @@ export const useDeleteProduct = () => {
     })
 }
 
+// -------------------------------------------------------- Product end -----------------------------------------------------------------------
 
 
-// Category
 
-export const useCategories = () => {
+
+// -------------------------------------------------------- Category start -----------------------------------------------------------------------
+
+export const useGetCategories = () => {
   return useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: categoryApi.getAll,
+  })
+}
+
+export const useGetCategory = (id: string) => {
+  return useQuery<Category>({
+    queryKey: ["category", id],
+    queryFn: () => categoryApi.getOne(id),
   })
 }
 
@@ -120,7 +130,6 @@ export const useCreateCategory = () => {
 
 export const useUpdateCategory = () => {
   const qc = useQueryClient()
-
   return useMutation({
     mutationFn: ({
       id,
@@ -137,7 +146,6 @@ export const useUpdateCategory = () => {
 
 export const useDeleteCategory = () => {
   const qc = useQueryClient()
-
   return useMutation({
     mutationFn: (id: string) => categoryApi.delete(id),
     onSuccess: () => {
@@ -145,4 +153,8 @@ export const useDeleteCategory = () => {
     },
   })
 }
+
+
+// -------------------------------------------------------- Category end -----------------------------------------------------------------------
+
 

@@ -9,12 +9,12 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Edit, Trash2, FolderTree } from "lucide-react"
 import { toast } from "sonner"
-import { useCategories, useCreateCategory, useDeleteCategory, useUpdateCategory } from "@/app/features/hooks"
+import { useGetCategories, useCreateCategory, useDeleteCategory, useUpdateCategory } from "@/app/features/hooks"
 import { Category } from "@/app/features/types"
 
 
 export default function CategoriesPage() {
-    const { data, isError, isPending } = useCategories()
+    const { data, isError, isPending } = useGetCategories()
     const create = useCreateCategory()
     const update = useUpdateCategory()
     const del = useDeleteCategory()

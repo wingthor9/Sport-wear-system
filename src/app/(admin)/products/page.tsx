@@ -11,13 +11,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, } 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { toast } from "sonner"
-import { mockCategories } from "@/app/demo-data/mockData"
-import { useCreateProduct, useDeleteProduct, useGetProducts, useUpdateProduct } from "@/app/features/hooks"
+import { useCreateProduct, useDeleteProduct, useGetCategories, useGetProducts, useUpdateProduct } from "@/app/features/hooks"
 import Image from "next/image"
-import { Product } from "@/app/features/types"
+import { Category, Product } from "@/app/features/types"
+import ImageUpload from "@/components/ImageUpload"
 
 export default function ProductsPage() {
-    const { data = [], isLoading } = useGetProducts()
+    const { data = [] } = useGetProducts()
+    const { data: categories = [], isLoading, error } = useGetCategories()
     const create = useCreateProduct()
     const update = useUpdateProduct()
     const del = useDeleteProduct()
@@ -25,6 +26,9 @@ export default function ProductsPage() {
     const [searchQuery, setSearchQuery] = useState("")
     const [showDialog, setShowDialog] = useState(false)
     const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+    const [imagePreview, setImagePreview] = useState<string[]>([])
+    const [images, setImages] = useState<File[]>([])
+
 
     // 🔥 form state (ยังใช้แบบเดิมเพื่อไม่เปลี่ยน UI)
     const [formData, setFormData] = useState({
@@ -33,13 +37,14 @@ export default function ProductsPage() {
         stock_qty: "",
         category_id: "",
         description: "",
-        image: "",
+        image: [] as File[],
     })
 
     // ✅ fetch
     useEffect(() => {
         // React Query fetch อัตโนมัติอยู่แล้ว แต่กันพลาด
     }, [])
+    console.log("product : ", data)
 
     // ✅ filter
     const filteredProducts = useMemo(() => {
@@ -57,7 +62,7 @@ export default function ProductsPage() {
             stock_qty: "",
             category_id: "",
             description: "",
-            image: "",
+            image: [] as File[],
         })
         setShowDialog(true)
     }
@@ -70,8 +75,9 @@ export default function ProductsPage() {
             stock_qty: String(product.stock_qty),
             category_id: product.category_id,
             description: product.description || "",
-            image: product.images?.[0]?.image_url || "",
+            image: [] as File[],
         })
+        setImagePreview(product.images.map((img) => img.image_url))
         setShowDialog(true)
     }
 
@@ -86,18 +92,19 @@ export default function ProductsPage() {
 
     const toFormData = () => {
         const fd = new FormData()
-        fd.append("product_name", formData.product_name)
+
+        fd.append("name", formData.product_name)
         fd.append("price", formData.price)
-        fd.append("stock_qty", formData.stock_qty)
-        fd.append("category_id", formData.category_id)
+        fd.append("stock", formData.stock_qty)
+        fd.append("categoryId", formData.category_id)
 
         if (formData.description) {
             fd.append("description", formData.description)
         }
 
-        if (formData.image) {
-            fd.append("image", formData.image)
-        }
+        formData.image.forEach((file) => {
+            fd.append("images", file)
+        })
 
         return fd
     }
@@ -176,11 +183,24 @@ export default function ProductsPage() {
                                 <tr key={product.product_id}>
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
-                                            <Image
-                                                src={product.images?.[0]?.image_url}
+                                            {/* <Image
+                                                src={product.images?.[0]?.image_url || ""}
                                                 alt={product.product_name}
+                                                width={48}
+                                                height={48}
                                                 className="w-12 h-12 object-cover"
-                                            />
+                                            /> */}
+
+                                            {product.images?.[0]?.image_url ? (
+                                                <Image
+                                                    src={product.images[0].image_url}
+                                                    alt={product.product_name}
+                                                    width={48}
+                                                    height={48}
+                                                />
+                                            ) : (
+                                                <div className="flex items-center justify-center w-12 h-12 bg-gray-200 rounded">No Image</div>
+                                            )}
                                             <p>{product.product_name}</p>
                                         </div>
                                     </td>
@@ -279,16 +299,51 @@ export default function ProductsPage() {
                             </SelectTrigger>
 
                             <SelectContent>
-                                {/* {mockCategories.map((c) => (
+                                {categories.map((c: Category) => (
                                     <SelectItem
                                         key={c.category_id}
                                         value={c.category_id}
                                     >
                                         {c.category_name}
                                     </SelectItem>
-                                ))} */}
+                                ))}
                             </SelectContent>
                         </Select>
+
+                        {/* <div className="space-y-2">
+                            <label className="text-sm">Product Image</label>
+                            <Input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const files = Array.from(e.target.files || [])
+
+                                    setFormData({
+                                        ...formData,
+                                        image: files,
+                                    })
+
+                                    const previews = files.map((file) => URL.createObjectURL(file))
+                                    setImagePreview(previews)
+                                }}
+                            />
+                            <div className="flex gap-2 flex-wrap">
+                                {imagePreview.map((img, index) => (
+                                    <Image
+                                        key={index}
+                                        src={img}
+                                        width={96}
+                                        height={96}
+                                        className="w-24 h-24 object-cover rounded"
+                                        alt="preview"
+                                    />
+                                ))}
+                            </div>
+                        </div> */}
+
+                        <ImageUpload files={images} setFiles={setImages} max={5} />
+
 
                         <div className="flex justify-end gap-2">
                             <Button
