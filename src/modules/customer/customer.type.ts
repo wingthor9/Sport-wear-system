@@ -2,7 +2,7 @@
 
 // Customer 
 
-export type Customer = {
+export type Customers = {
     customer_id: string
     customer_name: string
     email: string
@@ -34,4 +34,45 @@ export type UpdateCustomerInput = {
     gender?: string
     address?: string
     isActive?: boolean
+}
+
+export type CustomerStatus = "ACTIVE" | "INACTIVE";
+
+
+
+
+export interface PointsTransaction {
+  id: string;
+  date: string;
+  type: "EARNED" | "REDEEMED";
+  points: number;
+  description: string;
+  orderId?: string;
+}
+
+export interface CustomerOrder {
+  id: string;
+  orderNumber: string;
+  date: string;
+  total: number;
+  status: string;
+  itemsCount: number;
+}
+
+export interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  joinDate: string;
+  lastOrderDate: string;
+  totalOrders: number;
+  totalSpent: number;
+  loyaltyPoints: number;
+  status: CustomerStatus;
+  orders: CustomerOrder[];
+  pointsHistory: PointsTransaction[];
 }
