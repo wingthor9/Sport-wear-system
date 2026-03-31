@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
-import { UpdateEmployeeInput } from "./employeetype"
+import { UpdateEmployeeInput } from "./employee.type"
 import { BadRequestError, NotFoundError } from "@/utils/response"
 
 export const employeeService = {

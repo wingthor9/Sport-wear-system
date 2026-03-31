@@ -130,6 +130,7 @@ export const productService = {
     if (!updatedProduct) {
       throw new BadRequestError("Product not updated");
     }
+    console.log("update product : ",updatedProduct)
     return updatedProduct;
   },
 

@@ -2,8 +2,8 @@
 
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
-import { CreatePurchaseInput, UpdatePurchaseInput } from "./purchase.type"
 import { BadRequestError, NotFoundError } from "@/utils/response"
+import { CreatePurchaseOrderInput, UpdatePurchaseOrderInput } from "./purchase.type"
 
 export const purchaseService = {
     async getPurchases(options?: Prisma.PurchaseOrderFindManyArgs) {
@@ -40,7 +40,7 @@ export const purchaseService = {
 
 
 
-    async createPurchase(data: CreatePurchaseInput, userId: string) {
+    async createPurchase(data: CreatePurchaseOrderInput, userId: string) {
         return prisma.$transaction(async (tx) => {
             if (!data.purchase_details.length) {
                 throw new BadRequestError("Purchase must have at least one item")
@@ -66,7 +66,7 @@ export const purchaseService = {
         })
     },
 
-    async updatePurchase(id: string, data: UpdatePurchaseInput) {
+    async updatePurchase(id: string, data: UpdatePurchaseOrderInput) {
         return prisma.$transaction(async (tx) => {
             const existing = await tx.purchaseOrder.findUnique({
                 where: { purchase_id: id },

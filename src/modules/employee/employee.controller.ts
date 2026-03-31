@@ -5,7 +5,7 @@ import { getSortingParams } from "@/utils/sorting"
 import { Prisma } from "@prisma/client"
 import { NextRequest } from "next/server"
 import { employeeService } from "./employee.service"
-import { UpdateEmployeeInput } from "./employeetype"
+import { UpdateEmployeeInput } from "./employee.type"
 import { BadRequestError, errorResponse, ForbiddenError, NotFoundError, successResponse, UnauthorizedError } from "@/utils/response"
 
 export const employeeController = {

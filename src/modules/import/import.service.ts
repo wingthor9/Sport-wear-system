@@ -66,7 +66,7 @@ export const importService = {
 
 
             // ✅ 2. validate import
-            for (const item of data.item) {
+            for (const item of data.import_details) {
                 const purchaseDetail = detailMap.get(item.product_id)
 
                 if (!purchaseDetail) {
@@ -88,14 +88,14 @@ export const importService = {
                     purchase_id: data.purchase_id,
                     employee_id: userId,
                     import_details: {
-                        create: data.item
+                        create: data.import_details
                     }
                 },
                 include: { import_details: true }
             })
 
             // 🔁 4. update purchase_detail + product stock
-            for (const item of data.item) {
+            for (const item of data.import_details) {
 
                 // update received_qty
                 await tx.purchaseDetail.updateMany({

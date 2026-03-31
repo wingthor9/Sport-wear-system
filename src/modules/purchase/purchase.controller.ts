@@ -5,9 +5,9 @@ import { getSearchParam } from "@/utils/search"
 import { getSortingParams } from "@/utils/sorting"
 import { Prisma } from "@prisma/client"
 import { NextRequest } from "next/server"
-import { CreatePurchaseInput, UpdatePurchaseInput } from "./purchase.type"
 import { BadRequestError, errorResponse, ForbiddenError, NotFoundError, successResponse, UnauthorizedError } from "@/utils/response"
 import { getUserFromToken } from "@/utils/cookie"
+import { CreatePurchaseOrderInput, UpdatePurchaseOrderInput } from "./purchase.type"
 
 
 export const purchaseController = {
@@ -60,7 +60,7 @@ return errorResponse("Internal Server Error", 500)
     },
 
     async createPurchase(req: NextRequest) {
-        const body: CreatePurchaseInput = await req.json()
+        const body: CreatePurchaseOrderInput = await req.json()
         const payload = getUserFromToken(req)
         const userId = (await payload).id
         const purchase = await purchaseService.createPurchase(body, userId)
@@ -69,7 +69,7 @@ return errorResponse("Internal Server Error", 500)
 
     async updatePurchase(req: NextRequest, id: string) {
         try {
-            const body: UpdatePurchaseInput = await req.json()
+            const body: UpdatePurchaseOrderInput = await req.json()
             const purchase = await purchaseService.updatePurchase(id, body)
             return successResponse(purchase, "Update purchase successfully", 200)
         } catch (error) {

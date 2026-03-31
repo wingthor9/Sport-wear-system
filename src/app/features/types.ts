@@ -16,34 +16,20 @@ export type CurrentUser = {
 }
 
 
-
-
-// Products 
-export type ProductImage = {
-  image_id: string
-  image_url: string
-  public_id: string
+export type Customer = {
+  id: string
+  name: string
+  email: string
+  phone: string
+  points: number
+  totalOrders: number
+  totalSpent: number
+  joinedAt: string
+  status: "active" | "inactive"
 }
 
-export type Product = {
-  product_id: string
-  product_name: string
-  price: number
-  stock_qty: number
-  description?: string
-  category_id: string
-  images: ProductImage[]
-}
-
-//  category 
 
 
 
-export type Category = {
-  category_id: string
-  category_name: string
-  description?: string
-  createdAt: string
-  updatedAt: string
-  products?: Product[]
-}
+
+

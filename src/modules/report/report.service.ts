@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma"
-import { NotFoundError } from "@/utils/response"
 
 export const reportService = {
     // Product Report

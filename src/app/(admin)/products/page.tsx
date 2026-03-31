@@ -13,8 +13,9 @@ import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { useCreateProduct, useDeleteProduct, useGetCategories, useGetProducts, useUpdateProduct } from "@/app/features/hooks"
 import Image from "next/image"
-import { Category, Product } from "@/app/features/types"
 import ImageUpload from "@/components/ImageUpload"
+import { Product } from "@/modules/product/product.types"
+import { Category } from "@/modules/category/category.type"
 
 export default function ProductsPage() {
     const { data = [] } = useGetProducts()
@@ -102,7 +103,10 @@ export default function ProductsPage() {
             fd.append("description", formData.description)
         }
 
-        formData.image.forEach((file) => {
+        // formData.image.forEach((file) => {
+        //     fd.append("images", file)
+        // })
+        images.forEach((file) => {
             fd.append("images", file)
         })
 
@@ -113,30 +117,24 @@ export default function ProductsPage() {
         e.preventDefault()
 
         try {
-            const formData = toFormData();
-            const product: Product = {
-                product_id: editingProduct ? editingProduct.product_id : '',
-                product_name: formData.get('product_name') as string,
-                price: Number(formData.get('price')),
-                stock_qty: Number(formData.get('stock_qty')),
-                description: formData.get('description') as string,
-                category_id: formData.get('category_id') as string,
-                images: [],
-            };
+            const fd = toFormData()   // ใช้ FormData
 
             if (editingProduct) {
                 await update.mutateAsync({
                     id: editingProduct.product_id,
-                    data: product,
+                    data: fd,
                 })
+
                 toast.success("Updated")
             } else {
-                await create.mutateAsync(toFormData())
+                await create.mutateAsync(fd)
                 toast.success("Created")
             }
 
             setShowDialog(false)
-        } catch {
+
+        } catch (error) {
+            console.error(error)
             toast.error("Something went wrong")
         }
     }

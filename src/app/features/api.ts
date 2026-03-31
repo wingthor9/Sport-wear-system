@@ -1,6 +1,15 @@
 // auth
-import { Category, LoginInput, Product, RegisterInput } from "./types"
+import { CreateCustomerInput, UpdateCustomerInput, Customer } from "@/modules/customer/customer.type"
+import { LoginInput, RegisterInput } from "./types"
 import axiosInstance from "@/lib/axiosInstance"
+import { CreateEmployeeInput, Employee, UpdateEmployeeInput } from "@/modules/employee/employee.type"
+import { Product } from "@/modules/product/product.types"
+import { Category, CreateCategoryInput, UpdateCategoryInput } from "@/modules/category/category.type"
+import { CreateSupplierInput, Supplier, UpdateSupplierInput } from "@/modules/supplier/supplier.type"
+import { CreatePurchaseOrderInput, PurchaseOrder, UpdatePurchaseOrderInput } from "@/modules/purchase/purchase.type"
+import { CreateOrderInput, Order, UpdateOrderStatusInput } from "@/modules/order/order.types"
+import { CreateSaleInput, Sale } from "@/modules/sale/sale.type"
+import { CreateRefundInput, Refund } from "@/modules/refund/refund.type"
 
 // -------------------------------------------------------- Auth start -----------------------------------------------------------------------
 
@@ -56,7 +65,7 @@ export const productApi = {
     return res.data.data.data
   },
 
-  update: async (id: string, data: Product): Promise<Product> => {
+  update: async (id: string, data: FormData): Promise<Product> => {
     const res = await axiosInstance.put(`/products/${id}`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -87,18 +96,12 @@ export const categoryApi = {
     return res.data.data.data
   },
 
-  create: async (data: {
-    category_name: string
-    description?: string
-  }): Promise<Category> => {
+  create: async (data: CreateCategoryInput): Promise<Category> => {
     const res = await axiosInstance.post("/categories", data)
     return res.data.data.data
   },
 
-  update: async (
-    id: string,
-    data: { category_name: string; description?: string }
-  ): Promise<Category> => {
+  update: async (id: string, data: UpdateCategoryInput): Promise<Category> => {
     const res = await axiosInstance.put(`/categories/${id}`, data)
     return res.data.data.data
   },
@@ -109,3 +112,248 @@ export const categoryApi = {
 }
 
 // -------------------------------------------------------- Category end -----------------------------------------------------------------------
+
+
+// -------------------------------------------------------- Customer start -----------------------------------------------------------------------
+
+export const customerApi = {
+
+  getAll: async (): Promise<Customer[]> => {
+    const res = await axiosInstance.get("/customers")
+    return res.data.data.data
+  },
+
+  getById: async (id: string): Promise<Customer> => {
+    const res = await axiosInstance.get(`/customers/${id}`)
+    return res.data.data.data
+  },
+
+  create: async (data: CreateCustomerInput): Promise<Customer> => {
+    const res = await axiosInstance.post("/customers", data)
+    return res.data.data.data
+  },
+
+  update: async (id: string, data: UpdateCustomerInput): Promise<Customer> => {
+    const res = await axiosInstance.put(`/customers/${id}`, data)
+    return res.data.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/customers/${id}`)
+  },
+}
+
+
+
+// -------------------------------------------------------- Customer end -----------------------------------------------------------------------
+
+
+// -------------------------------------------------------- Employee start -----------------------------------------------------------------------
+
+
+export const employeeApi = {
+
+  getAll: async (): Promise<Employee[]> => {
+    const res = await axiosInstance.get("/employees")
+    return res.data.data.data
+  },
+
+  getById: async (id: string): Promise<Employee> => {
+    const res = await axiosInstance.get(`/employees/${id}`)
+    return res.data.data.data
+  },
+
+  create: async (data: CreateEmployeeInput): Promise<Employee> => {
+    const res = await axiosInstance.post("/employees", data)
+    return res.data.data.data
+  },
+
+  update: async (
+    id: string,
+    data: UpdateEmployeeInput
+  ): Promise<Employee> => {
+    const res = await axiosInstance.put(`/employees/${id}`, data)
+    return res.data.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/employees/${id}`)
+  },
+}
+
+// -------------------------------------------------------- Employee end -----------------------------------------------------------------------
+
+
+
+// -------------------------------------------------------- Supplier start -----------------------------------------------------------------------
+
+
+export const supplierApi = {
+
+  getAll: async (): Promise<Supplier[]> => {
+    const res = await axiosInstance.get("/suppliers")
+    return res.data.data.data
+  },
+
+  getById: async (id: string): Promise<Supplier> => {
+    const res = await axiosInstance.get(`/suppliers/${id}`)
+    return res.data.data.data
+  },
+
+  create: async (data: CreateSupplierInput): Promise<Supplier> => {
+    const res = await axiosInstance.post("/suppliers", data)
+    return res.data.data.data
+  },
+
+  update: async (
+    id: string,
+    data: UpdateSupplierInput
+  ): Promise<Supplier> => {
+    const res = await axiosInstance.put(`/suppliers/${id}`, data)
+    return res.data.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/suppliers/${id}`)
+  }
+}
+
+
+
+// -------------------------------------------------------- Supplier end -----------------------------------------------------------------------
+
+
+// --------------------------------------------------------  Purchase start -----------------------------------------------------------------------
+
+
+export const purchaseApi = {
+
+  getAll: async (): Promise<PurchaseOrder[]> => {
+    const res = await axiosInstance.get("/purchase-orders")
+    return res.data.data.data
+  },
+
+  getById: async (id: string): Promise<PurchaseOrder> => {
+    const res = await axiosInstance.get(`/purchase-orders/${id}`)
+    return res.data.data.data
+  },
+
+  create: async (data: CreatePurchaseOrderInput): Promise<PurchaseOrder> => {
+    const res = await axiosInstance.post("/purchase-orders", data)
+    return res.data.data.data
+  },
+
+  update: async (
+    id: string,
+    data: UpdatePurchaseOrderInput
+  ): Promise<PurchaseOrder> => {
+    const res = await axiosInstance.put(`/purchase-orders/${id}`, data)
+    return res.data.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/purchase-orders/${id}`)
+  }
+}
+
+
+
+// --------------------------------------------------------  Purchase end -----------------------------------------------------------------------
+
+
+// --------------------------------------------------------  Order start -----------------------------------------------------------------------
+
+export const orderApi = {
+
+  getAll: async (): Promise<Order[]> => {
+    const res = await axiosInstance.get("/orders")
+    return res.data.data
+  },
+
+  getById: async (id: string): Promise<Order> => {
+    const res = await axiosInstance.get(`/orders/${id}`)
+    return res.data.data
+  },
+
+  create: async (data: CreateOrderInput): Promise<Order> => {
+    const res = await axiosInstance.post("/orders", data)
+    return res.data.data
+  },
+
+  updateStatus: async (
+    id: string,
+    data: UpdateOrderStatusInput
+  ): Promise<Order> => {
+    const res = await axiosInstance.put(`/orders/${id}`, data)
+    return res.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/orders/${id}`)
+  }
+}
+
+
+// --------------------------------------------------------  Order end -----------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------  sale or POS start -----------------------------------------------------------------------
+
+export const saleApi = {
+
+  getAll: async (): Promise<Sale[]> => {
+    const res = await axiosInstance.get("/sales")
+    return res.data.data
+  },
+
+  getById: async (id: string): Promise<Sale> => {
+    const res = await axiosInstance.get(`/sales/${id}`)
+    return res.data.data
+  },
+
+  create: async (data: CreateSaleInput): Promise<Sale> => {
+    const res = await axiosInstance.post("/sales", data)
+    return res.data.data
+  },
+
+  // delete: async (id: string): Promise<void> => {
+  //   await axiosInstance.delete(`/sales/${id}`)
+  // }
+}
+
+
+
+// --------------------------------------------------------  sale or POS end -----------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------  Refund start -----------------------------------------------------------------------
+
+
+export const refundApi = {
+
+  getAll: async (): Promise<Refund[]> => {
+    const res = await axiosInstance.get("/refunds")
+    return res.data.data
+  },
+
+  getById: async (id: string): Promise<Refund> => {
+    const res = await axiosInstance.get(`/refunds/${id}`)
+    return res.data.data
+  },
+
+  create: async (data: CreateRefundInput): Promise<Refund> => {
+    const res = await axiosInstance.post("/refunds", data)
+    return res.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/refunds/${id}`)
+  }
+}
+
+
+
+// --------------------------------------------------------  Refund end -----------------------------------------------------------------------
+
