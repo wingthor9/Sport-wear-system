@@ -5,19 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Customer, CustomerStatus } from "@/modules/customer/customer.type";
-import {
-    User,
-    Mail,
-    Phone,
-    MapPin,
-    Calendar,
-    DollarSign,
-    ShoppingBag,
-    Award,
-    TrendingUp,
-    TrendingDown,
-    Package,
-} from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, DollarSign, ShoppingBag, Award, TrendingUp, TrendingDown, Package,} from "lucide-react";
 
 interface CustomerDetailDialogProps {
     open: boolean;
@@ -38,12 +26,7 @@ const getStatusBadge = (status: CustomerStatus) => {
     );
 };
 
-export function CustomerDetailDialog({
-    open,
-    onOpenChange,
-    customer,
-    onToggleStatus,
-}: CustomerDetailDialogProps) {
+export function CustomerDetailDialog({ open, onOpenChange, customer, onToggleStatus,}: CustomerDetailDialogProps) {
     if (!customer) return null;
 
     const formatDate = (dateString: string) => {
@@ -72,7 +55,7 @@ export function CustomerDetailDialog({
         if (onToggleStatus) {
             const newStatus: CustomerStatus =
                 customer.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-            onToggleStatus(customer.id, newStatus);
+            onToggleStatus(customer.customer_id, newStatus);
         }
     };
 
@@ -82,9 +65,9 @@ export function CustomerDetailDialog({
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <div>
-                            <DialogTitle className="text-2xl">{customer.name}</DialogTitle>
+                            <DialogTitle className="text-2xl">{customer.customer_name}</DialogTitle>
                             <DialogDescription className="text-base mt-1">
-                                Customer ID: {customer.id}
+                                Customer ID: {customer.customer_id}
                             </DialogDescription>
                         </div>
                         <div className="flex items-center gap-2">
@@ -111,7 +94,8 @@ export function CustomerDetailDialog({
                             </div>
                             <p className="text-sm text-gray-600">Total Spent</p>
                             <p className="text-xl font-bold">
-                                ${customer.totalSpent.toLocaleString()}
+                                {/* ${customer.totalSpent.toLocaleString()} */}
+                                $1200
                             </p>
                         </Card>
                         <Card className="p-4">
@@ -131,7 +115,8 @@ export function CustomerDetailDialog({
                             </div>
                             <p className="text-sm text-gray-600">Loyalty Points</p>
                             <p className="text-xl font-bold">
-                                {customer.loyaltyPoints.toLocaleString()}
+                                {/* {customer.loyaltyPoints.toLocaleString()} */}
+                                500
                             </p>
                         </Card>
                         <Card className="p-4">
@@ -263,7 +248,7 @@ export function CustomerDetailDialog({
                             <Award className="h-5 w-5" />
                             Points History
                         </h3>
-                        <div className="space-y-2">
+                        {/* <div className="space-y-2">
                             {customer.pointsHistory.length === 0 ? (
                                 <div className="text-center py-8 bg-gray-50 rounded-lg">
                                     <p className="text-gray-500">No points transactions yet</p>
@@ -313,7 +298,7 @@ export function CustomerDetailDialog({
                                     </div>
                                 ))
                             )}
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </DialogContent>

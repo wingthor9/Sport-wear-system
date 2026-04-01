@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { authApi, categoryApi, customerApi, employeeApi, orderApi, productApi, purchaseApi, refundApi, saleApi, supplierApi } from "./api"
 import { LoginInput, RegisterInput } from "./types"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import { CreateCustomerInput, UpdateCustomerInput } from "@/modules/customer/customer.type"
 import { CreateEmployeeInput, UpdateEmployeeInput } from "@/modules/employee/employee.type"
 import { Category, UpdateCategoryInput } from "@/modules/category/category.type"
@@ -12,6 +12,15 @@ import { CreatePurchaseOrderInput, UpdatePurchaseOrderInput } from "@/modules/pu
 import { CreateOrderInput, UpdateOrderStatusInput } from "@/modules/order/order.types"
 import { CreateSaleInput } from "@/modules/sale/sale.type"
 import { CreateRefundInput } from "@/modules/refund/refund.type"
+
+
+export type UseGetParams = {
+    page?: number
+    limit?: number
+    search?: string
+    orderBy?: string
+    order?: "asc" | "desc"
+}
 
 export const useAuth = () => {
     const router = useRouter()
@@ -57,10 +66,12 @@ export const useAuth = () => {
 
 // -------------------------------------------------------- Product start -----------------------------------------------------------------------
 
-export const useGetProducts = () => {
+
+export const useGetProducts = (params?: UseGetParams) => {
     return useQuery({
-        queryKey: ["products"],
-        queryFn: productApi.getAll,
+        queryKey: ["products", params],
+        queryFn: () => productApi.getAll(params),
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -164,10 +175,18 @@ export const useDeleteCategory = () => {
 // -------------------------------------------------------- Customer start -----------------------------------------------------------------------
 
 
-export const useGetCustomers = () => {
+export const useGetCustomers = (params?: UseGetParams) => {
     return useQuery({
-        queryKey: ["customers"],
-        queryFn: customerApi.getAll,
+        queryKey: ["customers", params],
+        queryFn: () => customerApi.getAll(params),
+        placeholderData: keepPreviousData,
+    })
+}
+
+export const useGetCustomer = (id: string) => {
+    return useQuery({
+        queryKey: ["customer", id],
+        queryFn: () => customerApi.getOne(id),
     })
 }
 

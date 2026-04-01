@@ -11,6 +11,14 @@ import { CreateOrderInput, Order, UpdateOrderStatusInput } from "@/modules/order
 import { CreateSaleInput, Sale } from "@/modules/sale/sale.type"
 import { CreateRefundInput, Refund } from "@/modules/refund/refund.type"
 
+export type GetParams = {
+  page?: number
+  limit?: number
+  search?: string
+  orderBy?: string
+  order?: "asc" | "desc"
+}
+
 // -------------------------------------------------------- Auth start -----------------------------------------------------------------------
 
 export const authApi = {
@@ -46,9 +54,20 @@ export const authApi = {
 
 // -------------------------------------------------------- Product start -----------------------------------------------------------------------
 export const productApi = {
-  getAll: async (): Promise<Product[]> => {
-    const res = await axiosInstance.get("/products")
-    return res.data.data.data
+
+  getAll: async (params?: GetParams): Promise<{
+    data: Product[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/products", {
+      params
+    })
+    return res.data.data
   },
 
   getOne: async (id: string): Promise<Product> => {
@@ -116,14 +135,25 @@ export const categoryApi = {
 
 // -------------------------------------------------------- Customer start -----------------------------------------------------------------------
 
-export const customerApi = {
 
-  getAll: async (): Promise<Customer[]> => {
-    const res = await axiosInstance.get("/customers")
-    return res.data.data.data
+export const customerApi = {
+  getAll: async (params?: GetParams): Promise<{
+    data: Customer[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/customers", {
+      params
+    })
+
+    return res.data.data
   },
 
-  getById: async (id: string): Promise<Customer> => {
+  getOne: async (id: string): Promise<Customer> => {
     const res = await axiosInstance.get(`/customers/${id}`)
     return res.data.data.data
   },

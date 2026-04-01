@@ -60,8 +60,8 @@ export interface CustomerOrder {
 }
 
 export interface Customer {
-  id: string;
-  name: string;
+  customer_id: string;
+  customer_name: string;
   email: string;
   phone: string;
   address: string;
@@ -72,7 +72,7 @@ export interface Customer {
   totalOrders: number;
   totalSpent: number;
   loyaltyPoints: number;
-  status: CustomerStatus;
+  isActive: CustomerStatus;
   orders: CustomerOrder[];
   pointsHistory: PointsTransaction[];
 }
