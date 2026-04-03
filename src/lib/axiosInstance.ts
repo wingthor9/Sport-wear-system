@@ -1,34 +1,51 @@
-// import { authApi } from "@/app/features/api";
-import axios from "axios";
-// import { useRouter } from "next/navigation";
+// import axios from "axios";
+
+// const axiosInstance = axios.create({
+//   baseURL: process.env.NEXT_PUBLIC_API_URL,
+//   withCredentials: true,
+//   headers: { "Content-Type": "application/json" },
+// });
+
+// axiosInstance.interceptors.response.use(
+//   (res) => res,
+//   (error) => {
+//     // ❌ ไม่ redirect ที่นี่
+//     return Promise.reject(error);
+//   }
+// );
+
+// export default axiosInstance;
+
+
+
+
+import axios from "axios"
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
-});
+})
 
 axiosInstance.interceptors.response.use(
   (res) => res,
   async (error) => {
-    // const originalRequest = error.config;
+    const originalRequest = error.config
 
-    // if (error.response?.status === 401 && !originalRequest._retry) {
-    //   originalRequest._retry = true;
+    // refresh token logic
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
 
-    //   // 👉 redirect ไป login
-    //   window.location.href = "/auth/login";
-    // }
-    if (error.response?.status === 401) {
-      const currentPath = window.location.pathname;
-
-      if (currentPath !== "/auth/login") {
-        window.location.href = "/auth/login";
+      try {
+        await axios.post("/auth/refresh", {}, { withCredentials: true })
+        return axiosInstance(originalRequest)
+      } catch {
+        return Promise.reject(error)
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)
 
-export default axiosInstance;
+export default axiosInstance

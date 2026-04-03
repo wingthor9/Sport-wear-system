@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { authService } from "./auth.service"
 import { BadRequestError, NotFoundError, ForbiddenError, UnauthorizedError, errorResponse, successResponse } from "@/utils/response"
-import { LoginInput, CustomerRegisterInput, EmployeeRegisterInput } from "./auth.type"
+import { LoginInput, CustomerRegisterInput, EmployeeRegisterInput, VerifyOTPInput, ForgotPasswordInput, ResetPasswordInput } from "./auth.type"
 import { clearAuthCookies, setAuthCookies } from "@/utils/cookie"
 import { verifyAccessToken } from "@/utils/jwt"
 import { loginLimiter, otpLimiter } from "@/utils/rateLimiter"
@@ -255,8 +255,8 @@ export const authController = {
         try {
             const ip = req.headers.get("x-forwarded-for") || "unknown"
             await otpLimiter.consume(ip)
-            const body = await req.json()
-            const result = await authService.adminForgotPassword(body.email)
+            const body: ForgotPasswordInput = await req.json()
+            const result = await authService.adminForgotPassword(body)
             return successResponse(result, "OTP sent", 200)
 
         } catch (error) {
@@ -269,11 +269,11 @@ export const authController = {
     },
     async adminVerifyOTP(req: NextRequest): Promise<NextResponse> {
         try {
-            const body = await req.json();
-            if (!body.email || !body.otp) {
+            const body: VerifyOTPInput = await req.json();
+            if (!body) {
                 throw new BadRequestError("Email and OTP are required");
             }
-            await authService.adminVerifyOTP(body.email, body.otp);
+            await authService.adminVerifyOTP(body);
             return successResponse(null, "OTP verified", 200);
         } catch (error) {
             if (
@@ -289,11 +289,11 @@ export const authController = {
     },
     async adminResetPassword(req: NextRequest): Promise<NextResponse> {
         try {
-            const body = await req.json();
-            if (!body.email || !body.password) {
+            const body: ResetPasswordInput = await req.json();
+            if (!body) {
                 throw new BadRequestError("Email and new password are required");
             }
-            await authService.adminResetPassword(body.email, body.password);
+            await authService.adminResetPassword(body);
             return successResponse(null, "Password reset successful", 200);
         } catch (error) {
             if (

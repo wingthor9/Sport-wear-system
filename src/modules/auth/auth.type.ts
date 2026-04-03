@@ -1,9 +1,9 @@
-export interface LoginInput {
+export type LoginInput = {
     email: string
     password: string
 }
 
-export interface CustomerRegisterInput {
+export type CustomerRegisterInput = {
     customer_name: string
     email: string
     password: string
@@ -11,21 +11,35 @@ export interface CustomerRegisterInput {
 }
 
 
-export interface EmployeeRegisterInput {
+export type EmployeeRegisterInput = {
     employee_name: string
     email: string
     password: string
     phone: string
 }
 
-export interface AuthUser {
+export type AuthUser = {
     user_id: string
     role: "ADMIN" | "STAFF" | "CUSTOMER"
 }
 
-export interface JwtPayload {
+export type JwtPayload = {
     user_id: string
     role: string
+}
+
+export type ForgotPasswordInput = {
+    email: string
+}
+
+export type VerifyOTPInput = {
+    email: string
+    otp: string
+}
+
+export type ResetPasswordInput = {
+    email: string
+    password: string
 }
 
 

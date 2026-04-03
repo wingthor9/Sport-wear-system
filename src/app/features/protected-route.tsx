@@ -1,24 +1,24 @@
 "use client"
 
-import { useAuthStore } from "@/store/useAuthStore"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { useAuth } from "./hooks"
 
 type Props = {
     children: React.ReactNode
 }
 
 export function ProtectedRoute({ children }: Props) {
-    const { user, loading } = useAuthStore()
+    const { user, isLoading } = useAuth()
     const router = useRouter()
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!isLoading && !user) {
             router.push("/auth/login")
         }
-    }, [user, loading])
+    }, [user, isLoading])
 
-    if (loading) return <div>Loading...</div>
+    if (isLoading) return <div>Loading...</div>
     if (!user) return null
 
     return <>{children}</>

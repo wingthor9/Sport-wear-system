@@ -22,30 +22,52 @@ export type GetParams = {
 // -------------------------------------------------------- Auth start -----------------------------------------------------------------------
 
 export const authApi = {
-  login: async (data: LoginInput) => {
+  adminLogin: async (data: LoginInput) => {
     // console.log("login data : ",data)
     const res = await axiosInstance.post("auth/employee/login", data)
     return res.data
   },
 
-  register: async (data: RegisterInput) => {
-    const res = await axiosInstance.post("/auth/register", data)
+  adminForgotPassword: async (email: string) => {
+    const res = await axiosInstance.post("/auth/admin/forgot-password", { email })
     return res.data
   },
 
-  logout: async () => {
-    await axiosInstance.post("/auth/logout")
+  adminResetPassword: async (data: {email: string, otp: string}) => {
+    const res = await axiosInstance.post("/auth/admin/reset-password", data)
+    return res.data
   },
 
-  refresh: async () => {
+  adminVerifyOtp: async (data: {email: string, password: string}) => {
+    const res = await axiosInstance.post("/auth/admin/verify-otp", data)
+    return res.data
+  },
+
+  adminRegister: async (data: RegisterInput) => {
+    const res = await axiosInstance.post("/auth/admin/register", data)
+    return res.data
+  },
+
+  adminLogout: async () => {
+    await axiosInstance.post("/auth/admin/logout")
+  },
+
+  adminRefresh: async () => {
     const res = await axiosInstance.post("/auth/refresh")
     return res.data
   },
 
-  me: async () => {
-    const res = await axiosInstance.get("/auth/me")
-    return res.data
-  }
+adminMe: async () => {
+    try {
+      const res = await axiosInstance.get("/auth/me")
+      return res.data
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        return null
+      }
+      throw err
+    }
+  },
 }
 
 // -------------------------------------------------------- Auth end -----------------------------------------------------------------------

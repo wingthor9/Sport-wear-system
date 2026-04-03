@@ -12,6 +12,7 @@ import { CreatePurchaseOrderInput, UpdatePurchaseOrderInput } from "@/modules/pu
 import { CreateOrderInput, UpdateOrderStatusInput } from "@/modules/order/order.types"
 import { CreateSaleInput } from "@/modules/sale/sale.type"
 import { CreateRefundInput } from "@/modules/refund/refund.type"
+import { VerifyOTPInput } from "@/modules/auth/auth.type"
 
 
 export type UseGetParams = {
@@ -22,45 +23,129 @@ export type UseGetParams = {
     order?: "asc" | "desc"
 }
 
+// export const useAuth = () => {
+//     const router = useRouter()
+//     const [loading, setLoading] = useState(false)
+
+//     const login = async (data: LoginInput) => {
+//         try {
+//             setLoading(true)
+//             await authApi.login(data)
+//             router.push("/admin/dashboard")
+//         } catch (error) {
+//             console.log(error)
+//             // 🔥 show error ให้ user
+//             alert(error instanceof Error ? error.message : "Login failed")
+
+//         } finally {
+//             setLoading(false)
+//         }
+//     }
+
+//     const register = async (data: RegisterInput) => {
+//         try {
+//             setLoading(true)
+//             await authApi.register(data)
+//             router.push("/auth/login")
+//         } finally {
+//             setLoading(false)
+//         }
+//     }
+
+//     const logout = async () => {
+//         await authApi.logout()
+//         router.push("/auth/login")
+//     }
+
+//     const refresh = async () => {
+//         await authApi.refresh()
+//     }
+
+//     return { login, register, logout, loading, refresh }
+// }
+
 export const useAuth = () => {
-    const router = useRouter()
-    const [loading, setLoading] = useState(false)
+    const { data, isLoading } = useAdminMe()
 
-    const login = async (data: LoginInput) => {
-        try {
-            setLoading(true)
-            await authApi.login(data)
-            router.push("/admin/dashboard")
-        } catch (error) {
-            console.log(error)
-            // 🔥 show error ให้ user
-            alert(error instanceof Error ? error.message : "Login failed")
+    return {
+        user: data?.data ?? null,
+        isLoading,
+        isAuthenticated: !!data?.data,
+    }
+}
 
-        } finally {
-            setLoading(false)
+export const useAdminMe = () => {
+    return useQuery({
+        queryKey: ["me"],
+        queryFn: authApi.adminMe,
+        retry: false,
+        staleTime: 1000 * 60 * 5,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+    })
+}
+
+export const useAdminLogin = () => {
+    const qc = useQueryClient()
+
+    return useMutation({
+        mutationFn: authApi.adminLogin,
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["me"] })
+        },
+    })
+}
+
+export const useAdminForgotPassword = () => {
+    return useMutation({
+        mutationFn: (email: string) => authApi.adminForgotPassword(email),
+    })
+}
+
+export const useAdminVerifyOtp = () => {
+    return useMutation({
+        mutationFn: authApi.adminVerifyOtp,
+    })
+}
+
+export const useAdminResetPassword = () => {
+    const qc = useQueryClient()
+    return useMutation({
+        mutationFn: authApi.adminResetPassword,
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["me"] })
         }
-    }
+    })
+}
 
-    const register = async (data: RegisterInput) => {
-        try {
-            setLoading(true)
-            await authApi.register(data)
-            router.push("/auth/login")
-        } finally {
-            setLoading(false)
-        }
-    }
+export const useAdminRegister = () => {
+    const qc = useQueryClient()
 
-    const logout = async () => {
-        await authApi.logout()
-        router.push("/auth/login")
-    }
+    return useMutation({
+        mutationFn: authApi.adminRegister,
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["me"] })
+        },
+    })
+}
 
-    const refresh = async () => {
-        await authApi.refresh()
-    }
+export const useAdminLogout = () => {
+    const qc = useQueryClient()
 
-    return { login, register, logout, loading, refresh }
+    return useMutation({
+        mutationFn: authApi.adminLogout,
+        onSuccess: () => {
+            qc.removeQueries({ queryKey: ["me"] })
+            window.location.href = "/login"
+
+        },
+    })
+}
+
+export const useAdminRefresh = () => {
+    return useMutation({
+        mutationFn: authApi.adminRefresh,
+    })
 }
 
 

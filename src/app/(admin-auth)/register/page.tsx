@@ -1,4 +1,3 @@
-import { RegisterForm } from '@/app/features/admin-auth/register-form';
 
 export default function LoginPage() {
     return (

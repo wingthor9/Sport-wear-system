@@ -1,113 +1,181 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { useAuthStore } from "@/store/useAuthStore"
-import { isAdmin } from "@/utils/auth"
+import { getRedirectPath } from "@/utils/auth"
 import { BarChart3, CreditCard, LayoutDashboard, Package, Settings, ShoppingBag, ShoppingCart, Store, UserCog, Users, } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { useAuth, useAdminLogout } from "../features/hooks"
 
-interface NavItem {
+
+type NavItem = {
     name: string
-    path: string
-    icon: React.ComponentType<{ className?: string }>
+    href: string
+    icon: any
+    roles: ("ADMIN" | "STAFF")[]
 }
 
+const navigation: NavItem[] = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN", "STAFF"] },
+    { name: "Point of Sale", href: "/pos", icon: ShoppingCart, roles: ["ADMIN", "STAFF"] },
+    { name: "Orders", href: "/orders", icon: ShoppingBag, roles: ["ADMIN", "STAFF"] },
+    { name: "Payments", href: "/payments", icon: CreditCard, roles: ["ADMIN"] },
+    { name: "Inventory", href: "/inventory", icon: Package, roles: ["ADMIN"] },
+    { name: "Customers", href: "/customers", icon: Users, roles: ["ADMIN"] },
+    { name: "Employees", href: "/employees", icon: UserCog, roles: ["ADMIN"] },
+    { name: "Reports", href: "/reports", icon: BarChart3, roles: ["ADMIN"] },
+    { name: "Settings", href: "/settings", icon: Settings, roles: ["ADMIN"] },
+]
 
-
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Point of Sale", href: "/pos", icon: ShoppingCart },
-  { name: "Orders", href: "/orders", icon: ShoppingBag },
-  { name: "Payment Verification", href: "/payments", icon: CreditCard },
-  { name: "Inventory", href: "/inventory", icon: Package },
-  { name: "Customers", href: "/customers", icon: Users },
-  { name: "Employees", href: "/employees", icon: UserCog },
-  { name: "Reports", href: "/reports", icon: BarChart3 },
-  { name: "Settings", href: "/settings", icon: Settings },
-];
-
-export default function AdminLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
+export default function AdminLayout({ children, }: { children: React.ReactNode }) {
     const router = useRouter()
-    const { user, loading } = useAuthStore()
     const pathname = usePathname()
-
-    const isActive = (path: string) => {
-        if (path === "/POS") {
-            return pathname === "/" || pathname === "/POS"
-        }
-        return pathname === path
-    }
+    const { user, isLoading } = useAuth()
+    const { mutate: logout, isPending } = useAdminLogout()
+    const [collapsed, setCollapsed] = useState(false)
+    const [mobileOpen, setMobileOpen] = useState(false)
 
     useEffect(() => {
-        if (loading) return
-        if (!user) {
-            router.replace("/auth/login")
-            return
+        if (isLoading) return;
+        if (!user || user === null) {
+            router.replace("/login")
         }
-        if (!isAdmin(user.role)) {
-            router.replace("/")
+        if (user) {
+            const redirectPath = getRedirectPath(user.role)
+            // ป้องกัน redirect loop
+            if (pathname !== redirectPath) {
+                router.replace(redirectPath)
+            }
         }
-    }, [user, loading, router])
 
-    if (!user || !isAdmin(user.role)) return null
+    }, [user, isLoading, pathname, router])
+    if (isLoading) return null
 
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className="flex h-screen bg-gray-50 ">
             {/* Sidebar */}
-            <aside className="flex h-screen w-64 flex-col bg-gray-900 text-white">
+            <aside
+                className={cn(
+                    "fixed md:relative z-40 h-screen bg-gray-900 text-white transition-all duration-300",
+                    collapsed ? "w-20" : "w-64",
+                    mobileOpen ? "left-0" : "-left-64 md:left-0"
+                )}
+            >
                 {/* Logo */}
-                <div className="flex h-16 items-center gap-2 border-b border-gray-800 px-6">
-                    <Store className="h-8 w-8 text-blue-500" />
-                    <div>
-                        <h1 className="font-bold text-lg">SportWear</h1>
-                        <p className="text-xs text-gray-400">Retail System</p>
+                <div className="flex h-16 items-center justify-between border-b border-gray-800 px-4">
+
+                    <div className="flex items-center gap-2">
+                        <Store className="h-8 w-8 text-blue-500" />
+
+                        {!collapsed && (
+                            <div>
+                                <h1 className="font-bold text-lg">SportWear</h1>
+                                <p className="text-xs text-gray-400">Retail System</p>
+                            </div>
+                        )}
                     </div>
+
+                    <button
+                        onClick={() => setCollapsed(!collapsed)}
+                        className="p-2 rounded hover:bg-gray-800"
+                    >
+                        ☰
+                    </button>
+
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 space-y-1 px-3 py-4">
-                    {navigation.map((item) => {
-                        const isActive = pathname === item.href;
-                        return (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className={cn(
-                                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                                    isActive
-                                        ? "bg-gray-800 text-white"
-                                        : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                                )}
-                            >
-                                <item.icon className="h-5 w-5" />
-                                {item.name}
-                            </Link>
-                        );
-                    })}
+                <nav className="flex-1 space-y-1 px-2 py-4">
+
+                    {user && navigation
+                        .filter((item) => item.roles.includes(user.role))
+                        .map((item) => {
+
+                            const isActive = pathname.startsWith(item.href)
+
+                            return (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    title={collapsed ? item.name : ""}
+                                    className={cn(
+                                        "relative flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                                        collapsed ? "justify-center" : "gap-3",
+                                        isActive
+                                            ? "bg-gray-800 text-white"
+                                            : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                                    )}
+                                >
+
+                                    {/* Active indicator */}
+                                    {isActive && (
+                                        <span className="absolute left-0 top-0 h-full w-1 bg-blue-500 rounded-r" />
+                                    )}
+
+                                    <item.icon className="h-5 w-5" />
+
+                                    {!collapsed && item.name}
+
+                                </Link>
+                            )
+                        })}
+
                 </nav>
 
                 {/* Footer */}
                 <div className="border-t border-gray-800 p-4">
-                    <div className="flex items-center gap-3">
+
+                    <div className={cn(
+                        "flex items-center",
+                        collapsed ? "justify-center" : "gap-3"
+                    )}>
+
                         <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center font-semibold">
-                            A
+                            {user && user.name?.charAt(0)}
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">Admin User</p>
-                            <p className="text-xs text-gray-400 truncate">admin@sportswear.com</p>
-                        </div>
+
+                        {!collapsed && (
+                            <>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium truncate">{user && user.name}</p>
+                                    <p className="text-xs text-gray-400 truncate">{user && user.email}</p>
+                                </div>
+
+                                <button
+                                    onClick={() => {
+                                        if (confirm("Are you sure to logout?")) logout()
+                                    }}
+                                    className="text-xs text-red-400 hover:text-red-300"
+                                >
+                                    Logout
+                                </button>
+                            </>
+                        )}
+
                     </div>
+
                 </div>
             </aside>
+            {/* Mobile overlay */}
+            {mobileOpen && (
+                <div
+                    onClick={() => setMobileOpen(false)}
+                    className="fixed inset-0 bg-black/50 md:hidden z-30"
+                />
+            )}
 
             {/* Main */}
-            <main className="flex-1 overflow-auto">
+            <main className="flex-1 overflow-auto border-2 border-red-500">
+                {/* Mobile menu button */}
+                <div className="p-3 md:hidden">
+                    <button
+                        onClick={() => setMobileOpen(true)}
+                        className="p-2 rounded hover:bg-gray-200"
+                    >
+                        ☰
+                    </button>
+                </div>
                 {children}
             </main>
         </div>

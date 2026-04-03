@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { comparePassword, hashPassword } from "@/utils/password"
 import { sendOTPEmail } from "@/utils/email"
-import { EmployeeRegisterInput, LoginInput, CustomerRegisterInput } from "./auth.type"
+import { EmployeeRegisterInput, LoginInput, CustomerRegisterInput, ForgotPasswordInput, VerifyOTPInput, ResetPasswordInput } from "./auth.type"
 import { generateAccessToken, generateRefreshToken, getUserFromToken } from "@/utils/cookie"
 import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "@/utils/response"
 import { NextRequest } from "next/server"
@@ -473,9 +473,9 @@ export const authService = {
 
         return { user,accessToken,refreshToken };
     },
-    async adminForgotPassword(email: string) {
+    async adminForgotPassword(data: ForgotPasswordInput) {
         const user = await prisma.employee.findUnique({
-            where: { email }
+            where: { email: data.email }
         });
         if (!user) {
             throw new NotFoundError("User not found");
@@ -483,7 +483,7 @@ export const authService = {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const result = await prisma.oTP.create({
             data: {
-                email,
+                email: data.email,
                 otp_code: otp,
                 type: "RESET_PASSWORD",
                 expiresAt: new Date(Date.now() + 5 * 60 * 1000)
@@ -493,16 +493,16 @@ export const authService = {
             throw new BadRequestError("Failed to create OTP");
         }
         // send code to email
-        sendOTPEmail(email, otp);
+        sendOTPEmail(data.email, otp);
         return { message: "OTP sent" }
     },
 
     // VERIFY OTP
-    async adminVerifyOTP(email: string, otp: string) {
+    async adminVerifyOTP(data: VerifyOTPInput) {
         const record = await prisma.oTP.findFirst({
             where: {
-                email,
-                otp_code: otp,
+                email: data.email,
+                otp_code: data.otp,
                 verified: false
             }
         });
@@ -527,10 +527,10 @@ export const authService = {
     },
 
     // RESET PASSWORD
-    async adminResetPassword(email: string, password: string) {
+    async adminResetPassword(data: ResetPasswordInput) {
         const otp = await prisma.oTP.findFirst({
             where: {
-                email,
+                email: data.email,
                 verified: true
             },
             orderBy: {
@@ -541,9 +541,9 @@ export const authService = {
         if (!otp) {
             throw new BadRequestError("OTP verification required");
         }
-        const hashed = await hashPassword(password);
+        const hashed = await hashPassword(data.password);
         await prisma.employee.update({
-            where: { email },
+            where: { email: data.email },
             data: { password: hashed }
         });
 
