@@ -14,10 +14,7 @@ export const customerService = {
                 sales: true
             }
         })
-
         return customers
-
-
     },
 
     async getCustomer(id: string) {
@@ -48,27 +45,47 @@ export const customerService = {
         return customer
     },
 
-    async deleteCustomer(id: string) {
-        const customer = await prisma.customer.findUnique({
-            where: { customer_id: id }
-        })
+    // async deleteCustomer(id: string) {
+    //     const customer = await prisma.customer.findUnique({
+    //         where: { customer_id: id }
+    //     })
 
-        if (!customer) {
-            throw new NotFoundError("Customer not found")
-        }
+    //     if (!customer) {
+    //         throw new NotFoundError("Customer not found")
+    //     }
 
-        // ❌ ถ้าปิดไปแล้ว
-        if (!customer.isActive) {
-            throw new BadRequestError("Customer already inactive")
-        }
+    //     // ❌ ถ้าปิดไปแล้ว
+    //     if (!customer.isActive) {
+    //         throw new BadRequestError("Customer already inactive")
+    //     }
 
-        // ✅ soft delete
-        return prisma.customer.update({
-            where: { customer_id: id },
-            data: {
-                isActive: false
-            }
-        })
+    //     // ✅ soft delete
+    //     return prisma.customer.update({
+    //         where: { customer_id: id },
+    //         data: {
+    //             isActive: false
+    //         }
+    //     })
+    // },
+
+async updateCustomerStatus(id: string) {
+
+    const customer = await prisma.customer.findUnique({
+        where: { customer_id: id }
+    });
+
+    if (!customer) {
+        throw new NotFoundError("Customer not found");
     }
+
+    const updatedCustomer = await prisma.customer.update({
+        where: { customer_id: id },
+        data: {
+            isActive: !customer.isActive
+        }
+    });
+
+    return updatedCustomer;
+}
 
 }

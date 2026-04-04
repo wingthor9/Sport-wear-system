@@ -42,11 +42,11 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
             router.replace("/login")
         }
         if (user) {
-            const redirectPath = getRedirectPath(user.role)
+             getRedirectPath(user.role)
             // ป้องกัน redirect loop
-            if (pathname !== redirectPath) {
-                router.replace(redirectPath)
-            }
+            // if (pathname !== redirectPath) {
+            //     router.replace(redirectPath)
+            // }
         }
 
     }, [user, isLoading, pathname, router])
@@ -64,10 +64,8 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
             >
                 {/* Logo */}
                 <div className="flex h-16 items-center justify-between border-b border-gray-800 px-4">
-
                     <div className="flex items-center gap-2">
                         <Store className="h-8 w-8 text-blue-500" />
-
                         {!collapsed && (
                             <div>
                                 <h1 className="font-bold text-lg">SportWear</h1>
@@ -75,25 +73,19 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
                             </div>
                         )}
                     </div>
-
                     <button
                         onClick={() => setCollapsed(!collapsed)}
                         className="p-2 rounded hover:bg-gray-800"
                     >
                         ☰
                     </button>
-
                 </div>
-
                 {/* Navigation */}
                 <nav className="flex-1 space-y-1 px-2 py-4">
-
                     {user && navigation
                         .filter((item) => item.roles.includes(user.role))
                         .map((item) => {
-
                             const isActive = pathname.startsWith(item.href)
-
                             return (
                                 <Link
                                     key={item.name}
@@ -107,34 +99,26 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
                                             : "text-gray-400 hover:bg-gray-800 hover:text-white"
                                     )}
                                 >
-
                                     {/* Active indicator */}
                                     {isActive && (
                                         <span className="absolute left-0 top-0 h-full w-1 bg-blue-500 rounded-r" />
                                     )}
-
                                     <item.icon className="h-5 w-5" />
-
                                     {!collapsed && item.name}
-
                                 </Link>
                             )
                         })}
 
                 </nav>
-
                 {/* Footer */}
                 <div className="border-t border-gray-800 p-4">
-
                     <div className={cn(
                         "flex items-center",
                         collapsed ? "justify-center" : "gap-3"
                     )}>
-
                         <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center font-semibold">
                             {user && user.name?.charAt(0)}
                         </div>
-
                         {!collapsed && (
                             <>
                                 <div className="flex-1 min-w-0">
@@ -152,9 +136,7 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
                                 </button>
                             </>
                         )}
-
                     </div>
-
                 </div>
             </aside>
             {/* Mobile overlay */}
@@ -164,7 +146,6 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
                     className="fixed inset-0 bg-black/50 md:hidden z-30"
                 />
             )}
-
             {/* Main */}
             <main className="flex-1 overflow-auto border-2 border-red-500">
                 {/* Mobile menu button */}

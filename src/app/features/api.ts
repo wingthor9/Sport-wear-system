@@ -196,9 +196,14 @@ export const customerApi = {
     return res.data.data.data
   },
 
-  delete: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/customers/${id}`)
-  },
+  // delete: async (id: string): Promise<void> => {
+  //   await axiosInstance.delete(`/customers/${id}`)
+  // },
+
+updateStatus: async (id: string) => {
+  const res = await axiosInstance.patch(`/customers/${id}`)
+  return res.data.data
+}
 }
 
 

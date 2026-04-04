@@ -34,7 +34,6 @@ export default function ResetPasswordPage() {
             email,
         },
     });
-    //   const { handleSubmit, formState: { errors }, setError, clearErrors, } = useForm();
 
 
     const onSubmit = (data: ResetPasswordInput) => {

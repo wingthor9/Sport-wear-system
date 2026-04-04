@@ -10,6 +10,12 @@ import { BadRequestError, errorResponse, ForbiddenError, NotFoundError, successR
 
 export const customerController = {
 
+
+    //     OR: [
+    //   { customer_name: { contains: search } },
+    //   { email: { contains: search } },
+    //   { phone: { contains: search } }
+    // ]
     async getCustomers(req: NextRequest) {
         try {
             const { page, limit, skip } = getPaginationParams(req)
@@ -56,7 +62,7 @@ export const customerController = {
         }
     },
 
-    async updateCustomer(req: Request, id: string) {
+    async updateCustomer(req: NextRequest, id: string) {
         try {
             const body: UpdateCustomerInput = await req.json()
             const customer = await customerService.updateCustomer(id, body)
@@ -70,18 +76,37 @@ export const customerController = {
         }
     },
 
-    async deleteCustomer(id: string) {
+    // async deleteCustomer(id: string) {
+    //     try {
+    //         await customerService.deleteCustomer(id)
+    //         return successResponse(null, "Delete customer successfully", 200)
+    //     } catch (error) {
+    //         console.log(error)
+    //         if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+    //             return errorResponse(error.message, error.statusCode);
+    //         }
+
+    //     }
+
+    // },
+
+    async updateCustomerStatus(req: NextRequest, id: string) {
         try {
-            await customerService.deleteCustomer(id)
-            return successResponse(null, "Delete customer successfully", 200)
+            const result = await customerService.updateCustomerStatus(id);
+            return successResponse( result, "Customer status updated successfully", 200 );
         } catch (error) {
             console.log(error)
-            if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+            if (
+                error instanceof BadRequestError ||
+                error instanceof NotFoundError ||
+                error instanceof ForbiddenError ||
+                error instanceof UnauthorizedError
+            ) {
                 return errorResponse(error.message, error.statusCode);
             }
-
+            return errorResponse("Internal Server Error", 500)
         }
-
     }
+
 
 }

@@ -59,6 +59,12 @@ export interface CustomerOrder {
   itemsCount: number;
 }
 
+export type Point = {
+  id: string;
+  point_amount: number;
+  date: string;
+}
+
 export interface Customer {
   customer_id: string;
   customer_name: string;
@@ -73,6 +79,7 @@ export interface Customer {
   totalSpent: number;
   loyaltyPoints: number;
   isActive: CustomerStatus;
+  points: Point[];
   orders: CustomerOrder[];
   pointsHistory: PointsTransaction[];
 }

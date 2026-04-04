@@ -232,7 +232,7 @@ export const authController = {
             const body: LoginInput = await req.json()
             const key = `${body.email}_${ip}`
             await loginLimiter.consume(key)
-            console.log(body)
+            // console.log(body)
             const result = await authService.adminLogin(body);
             // const { password, ...safeUser } = result.user;
             const response = successResponse(result, "Login successful", 200);
@@ -297,6 +297,7 @@ export const authController = {
             await authService.adminResendOTP(body);
             return successResponse(null, "OTP resent", 200);
         } catch (error) {
+            console.log(error)
             if (
                 error instanceof BadRequestError ||
                 error instanceof NotFoundError ||
@@ -315,8 +316,15 @@ export const authController = {
             if (!body) {
                 throw new BadRequestError("Email and new password are required");
             }
-            await authService.adminResetPassword(body);
-            return successResponse(null, "Password reset successful", 200);
+            const result = await authService.adminResetPassword(body);
+            const response = successResponse(result, "Reset password successful", 200);
+            setAuthCookies({
+                response,
+                accessToken: result.accessToken,
+                refreshToken: result.refreshToken
+            });
+            // return successResponse(null, "Password reset successful", 200);
+            return response
         } catch (error) {
             if (
                 error instanceof BadRequestError ||
@@ -379,7 +387,7 @@ export const authController = {
             return successResponse(user, "Get current user", 200)
         } catch (error) {
             console.log(error)
-            if (  error instanceof UnauthorizedError || error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+            if (error instanceof UnauthorizedError || error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode)
             }
             return errorResponse("Internal Server Error", 500)

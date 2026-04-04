@@ -330,16 +330,27 @@ export const useUpdateCustomer = () => {
     })
 }
 
-export const useDeleteCustomer = () => {
+// export const useDeleteCustomer = () => {
+//     const qc = useQueryClient()
+
+//     return useMutation({
+//         mutationFn: (id: string) => customerApi.delete(id),
+
+//         onSuccess: () => {
+//             qc.invalidateQueries({ queryKey: ["customers"] })
+//         },
+//     })
+// }
+
+export const useUpdateCustomerStatus = () => {
     const qc = useQueryClient()
-
     return useMutation({
-        mutationFn: (id: string) => customerApi.delete(id),
-
+        mutationFn: (id: string) => customerApi.updateStatus(id),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["customers"] })
-        },
+        }
     })
+
 }
 
 
@@ -348,7 +359,7 @@ export const useDeleteCustomer = () => {
 
 
 
-// -------------------------------------------------------- Customer start -----------------------------------------------------------------------
+// -------------------------------------------------------- Admin start -----------------------------------------------------------------------
 
 
 export const useGetEmployees = () => {
@@ -394,7 +405,7 @@ export const useDeleteEmployee = () => {
 }
 
 
-// -------------------------------------------------------- Customer end -----------------------------------------------------------------------
+// -------------------------------------------------------- Admin end -----------------------------------------------------------------------
 
 
 // -------------------------------------------------------- Supplier start -----------------------------------------------------------------------
