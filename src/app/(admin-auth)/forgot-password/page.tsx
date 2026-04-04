@@ -18,7 +18,7 @@ const forgotPasswordSchema = z.object({
     email: z.string().email(),
 });
 
-export function ForgotPasswordPage() {
+export default function ForgotPasswordPage() {
     const router = useRouter();
     const { mutate: sendOtp, isPending } = useAdminForgotPassword();
 
@@ -31,7 +31,7 @@ export function ForgotPasswordPage() {
     });
 
     const onSubmit = (data: ForgotPasswordInput) => {
-        sendOtp(data.email, {
+        sendOtp(data, {
             onSuccess: () => {
                 toast.success("OTP sent to your email!");
                 router.push(`/verify-otp?email=${data.email}`);

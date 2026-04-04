@@ -10,6 +10,7 @@ import { CreatePurchaseOrderInput, PurchaseOrder, UpdatePurchaseOrderInput } fro
 import { CreateOrderInput, Order, UpdateOrderStatusInput } from "@/modules/order/order.types"
 import { CreateSaleInput, Sale } from "@/modules/sale/sale.type"
 import { CreateRefundInput, Refund } from "@/modules/refund/refund.type"
+import { ForgotPasswordInput, ResetPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
 
 export type GetParams = {
   page?: number
@@ -28,18 +29,23 @@ export const authApi = {
     return res.data
   },
 
-  adminForgotPassword: async (email: string) => {
-    const res = await axiosInstance.post("/auth/admin/forgot-password", { email })
+  adminForgotPassword: async (data: ForgotPasswordInput) => {
+    const res = await axiosInstance.post("/auth/admin/forgot-password", data)
     return res.data
   },
 
-  adminResetPassword: async (data: {email: string, otp: string}) => {
+  adminResetPassword: async (data: ResetPasswordInput) => {
     const res = await axiosInstance.post("/auth/admin/reset-password", data)
     return res.data
   },
 
-  adminVerifyOtp: async (data: {email: string, password: string}) => {
+  adminVerifyOtp: async (data: VerifyOTPInput) => {
     const res = await axiosInstance.post("/auth/admin/verify-otp", data)
+    return res.data
+  },
+
+  adminResendOtp: async (data: ForgotPasswordInput) => {
+    const res = await axiosInstance.post("/auth/admin/resend-otp", data)
     return res.data
   },
 

@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { authService } from "./auth.service"
 import { BadRequestError, NotFoundError, ForbiddenError, UnauthorizedError, errorResponse, successResponse } from "@/utils/response"
-import { LoginInput, CustomerRegisterInput, EmployeeRegisterInput, VerifyOTPInput, ForgotPasswordInput, ResetPasswordInput } from "./auth.type"
+import { LoginInput, CustomerRegisterInput, EmployeeRegisterInput, VerifyOTPInput, ForgotPasswordInput, ResetPasswordInput, ResendOTPInput } from "./auth.type"
 import { clearAuthCookies, setAuthCookies } from "@/utils/cookie"
 import { verifyAccessToken } from "@/utils/jwt"
 import { loginLimiter, otpLimiter } from "@/utils/rateLimiter"
@@ -287,6 +287,28 @@ export const authController = {
             return errorResponse("Internal Server Error", 500)
         }
     },
+
+    async adminResendOTP(req: NextRequest): Promise<NextResponse> {
+        try {
+            const body: ResendOTPInput = await req.json();
+            if (!body) {
+                throw new BadRequestError("Email is required");
+            }
+            await authService.adminResendOTP(body);
+            return successResponse(null, "OTP resent", 200);
+        } catch (error) {
+            if (
+                error instanceof BadRequestError ||
+                error instanceof NotFoundError ||
+                error instanceof ForbiddenError ||
+                error instanceof UnauthorizedError
+            ) {
+                return errorResponse(error.message, error.statusCode);
+            }
+            return errorResponse("Internal Server Error", 500)
+        }
+    },
+
     async adminResetPassword(req: NextRequest): Promise<NextResponse> {
         try {
             const body: ResetPasswordInput = await req.json();

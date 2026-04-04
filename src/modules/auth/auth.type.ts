@@ -42,6 +42,10 @@ export type ResetPasswordInput = {
     password: string
 }
 
+export type ResendOTPInput = {
+    email: string
+}
+
 
 
 

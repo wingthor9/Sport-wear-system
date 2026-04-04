@@ -5,14 +5,14 @@ import { authApi, categoryApi, customerApi, employeeApi, orderApi, productApi, p
 import { LoginInput, RegisterInput } from "./types"
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import { CreateCustomerInput, UpdateCustomerInput } from "@/modules/customer/customer.type"
-import { CreateEmployeeInput, UpdateEmployeeInput } from "@/modules/employee/employee.type"
+import { CreateEmployeeInput, Employee, UpdateEmployeeInput } from "@/modules/employee/employee.type"
 import { Category, UpdateCategoryInput } from "@/modules/category/category.type"
 import { CreateSupplierInput, UpdateSupplierInput } from "@/modules/supplier/supplier.type"
 import { CreatePurchaseOrderInput, UpdatePurchaseOrderInput } from "@/modules/purchase/purchase.type"
 import { CreateOrderInput, UpdateOrderStatusInput } from "@/modules/order/order.types"
 import { CreateSaleInput } from "@/modules/sale/sale.type"
 import { CreateRefundInput } from "@/modules/refund/refund.type"
-import { VerifyOTPInput } from "@/modules/auth/auth.type"
+import { ForgotPasswordInput, ResetPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
 
 
 export type UseGetParams = {
@@ -98,13 +98,19 @@ export const useAdminLogin = () => {
 
 export const useAdminForgotPassword = () => {
     return useMutation({
-        mutationFn: (email: string) => authApi.adminForgotPassword(email),
+        mutationFn: (data: ForgotPasswordInput) => authApi.adminForgotPassword(data),
     })
 }
 
 export const useAdminVerifyOtp = () => {
     return useMutation({
-        mutationFn: authApi.adminVerifyOtp,
+        mutationFn: (data: VerifyOTPInput) => authApi.adminVerifyOtp(data),
+    })
+}
+
+export const useAdminResendOTP = () => {
+    return useMutation({
+        mutationFn: (data: ForgotPasswordInput) => authApi.adminResendOtp(data),
     })
 }
 
@@ -117,6 +123,29 @@ export const useAdminResetPassword = () => {
         }
     })
 }
+
+
+
+// export const useAdminResetPassword = () => {
+//     const qc = useQueryClient()
+
+//     return useMutation<
+//         {
+//             user: any
+//             accessToken: string
+//             refreshToken: string
+//         },
+//         Error,
+//         ResetPasswordInput
+//     >({
+//         mutationFn: (data) => authApi.adminResetPassword(data),
+
+//         onSuccess: () => {
+//             qc.invalidateQueries({ queryKey: ["me"] })
+//         }
+//     })
+// }
+
 
 export const useAdminRegister = () => {
     const qc = useQueryClient()

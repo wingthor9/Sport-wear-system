@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { comparePassword, hashPassword } from "@/utils/password"
 import { sendOTPEmail } from "@/utils/email"
-import { EmployeeRegisterInput, LoginInput, CustomerRegisterInput, ForgotPasswordInput, VerifyOTPInput, ResetPasswordInput } from "./auth.type"
+import { EmployeeRegisterInput, LoginInput, CustomerRegisterInput, ForgotPasswordInput, VerifyOTPInput, ResetPasswordInput, ResendOTPInput } from "./auth.type"
 import { generateAccessToken, generateRefreshToken, getUserFromToken } from "@/utils/cookie"
 import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "@/utils/response"
 import { NextRequest } from "next/server"
@@ -367,7 +367,7 @@ export const authService = {
         });
 
         if (existingUser) {
-            throw new NotFoundError("User already exists")
+            throw new BadRequestError("User already exists")
         }
         const hashedPassword = await hashPassword(data.password);
         const user = await prisma.employee.create({
@@ -471,7 +471,7 @@ export const authService = {
             throw new BadRequestError("Failed to create refresh token");
         }
 
-        return { user,accessToken,refreshToken };
+        return { user, accessToken, refreshToken };
     },
     async adminForgotPassword(data: ForgotPasswordInput) {
         const user = await prisma.employee.findUnique({
@@ -492,10 +492,38 @@ export const authService = {
         if (!result) {
             throw new BadRequestError("Failed to create OTP");
         }
+        console.log(`OTP: ${otp}`)
         // send code to email
         sendOTPEmail(data.email, otp);
         return { message: "OTP sent" }
     },
+
+    // RESEND OTP 
+    async adminResendOTP(data: ResendOTPInput) {
+        const user = await prisma.employee.findUnique({
+            where: { email: data.email }
+        });
+        if (!user) {
+            throw new NotFoundError("User not found");
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const result = await prisma.oTP.create({
+            data: {
+                email: data.email,
+                otp_code: otp,
+                type: "RESET_PASSWORD",
+                expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+            }
+        });
+        if (!result) {
+            throw new BadRequestError("Failed to create OTP");
+        }
+        console.log(`OTP: ${otp}`)
+        // send code to email
+        sendOTPEmail(data.email, otp);
+        return { message: "OTP sent" }
+    },
+
 
     // VERIFY OTP
     async adminVerifyOTP(data: VerifyOTPInput) {
@@ -526,12 +554,17 @@ export const authService = {
         return true;
     },
 
+
     // RESET PASSWORD
     async adminResetPassword(data: ResetPasswordInput) {
+
         const otp = await prisma.oTP.findFirst({
             where: {
                 email: data.email,
-                verified: true
+                verified: true,
+                createdAt: {
+                    gt: new Date(Date.now() - 10 * 60 * 1000)
+                }
             },
             orderBy: {
                 createdAt: "desc"
@@ -541,13 +574,53 @@ export const authService = {
         if (!otp) {
             throw new BadRequestError("OTP verification required");
         }
+
+        const user = await prisma.employee.findUnique({
+            where: { email: data.email }
+        });
+
+        if (!user) {
+            throw new NotFoundError("User not found");
+        }
+
         const hashed = await hashPassword(data.password);
+
         await prisma.employee.update({
             where: { email: data.email },
             data: { password: hashed }
         });
 
-        return true;
+        // ❗ invalidate old OTP
+        await prisma.oTP.update({
+            where: { otp_id: otp.otp_id },
+            data: { verified: false }
+        });
+
+        // 🔑 login user
+        const accessToken = generateAccessToken(user.employee_id, user.role);
+        const refreshToken = generateRefreshToken(user.employee_id);
+
+        const refreshTokenRecord = await prisma.refreshToken.create({
+            data: {
+                token: refreshToken,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                employee: {
+                    connect: {
+                        employee_id: user.employee_id
+                    }
+                }
+            }
+        });
+
+        if (!refreshTokenRecord) {
+            throw new BadRequestError("Failed to create refresh token");
+        }
+
+        return {
+            user,
+            accessToken,
+            refreshToken
+        };
     },
 
     async adminLogout(customerId: string) {
