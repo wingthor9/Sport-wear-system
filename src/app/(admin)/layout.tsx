@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { getRedirectPath } from "@/utils/auth"
-import { BarChart3, CreditCard, LayoutDashboard, Package, Settings, ShoppingBag, ShoppingCart, Store, UserCog, Users, } from "lucide-react"
+import { BarChart3, CreditCard, LayoutDashboard, LucideIcon, Package, Settings, ShoppingBag, ShoppingCart, Store, UserCog, Users, } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useAuth, useAdminLogout } from "../features/hooks"
@@ -12,7 +12,7 @@ import { useAuth, useAdminLogout } from "../features/hooks"
 type NavItem = {
     name: string
     href: string
-    icon: any
+    icon: LucideIcon
     roles: ("ADMIN" | "STAFF")[]
 }
 
@@ -21,7 +21,7 @@ const navigation: NavItem[] = [
     { name: "Point of Sale", href: "/pos", icon: ShoppingCart, roles: ["ADMIN", "STAFF"] },
     { name: "Orders", href: "/orders", icon: ShoppingBag, roles: ["ADMIN", "STAFF"] },
     { name: "Payments", href: "/payments", icon: CreditCard, roles: ["ADMIN"] },
-    { name: "Inventory", href: "/inventory", icon: Package, roles: ["ADMIN"] },
+    { name: "Product", href: "/products", icon: Package, roles: ["ADMIN"] },
     { name: "Customers", href: "/customers", icon: Users, roles: ["ADMIN"] },
     { name: "Employees", href: "/employees", icon: UserCog, roles: ["ADMIN"] },
     { name: "Reports", href: "/reports", icon: BarChart3, roles: ["ADMIN"] },
@@ -147,7 +147,7 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
                 />
             )}
             {/* Main */}
-            <main className="flex-1 overflow-auto border-2 border-red-500">
+            <main className="flex-1 overflow-auto my-8 mx-8">
                 {/* Mobile menu button */}
                 <div className="p-3 md:hidden">
                     <button

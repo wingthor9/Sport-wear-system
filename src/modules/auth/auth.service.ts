@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { comparePassword, hashPassword } from "@/utils/password"
 import { sendOTPEmail } from "@/utils/email"
 import { EmployeeRegisterInput, LoginInput, CustomerRegisterInput, ForgotPasswordInput, VerifyOTPInput, ResetPasswordInput, ResendOTPInput } from "./auth.type"
-import { generateAccessToken, generateRefreshToken, getUserFromToken } from "@/utils/cookie"
+import { generateAccessToken, generateRefreshToken } from "@/utils/cookie"
 import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "@/utils/response"
 import { NextRequest } from "next/server"
 import { verifyAccessToken } from "@/utils/jwt"
@@ -25,7 +25,11 @@ export const authService = {
                 customer_name: data.customer_name,
                 email: data.email,
                 phone: data.phone,
-                password: hashedPassword
+                password: hashedPassword,
+                gender: data.gender ?? undefined,
+                address: data.address ?? undefined,
+                isActive: true
+
             }
         });
 
@@ -691,7 +695,7 @@ export const authService = {
     // get me 
     async getMe(req: NextRequest) {
         const payload = verifyAccessToken(req);
-        console.log("payload : ", payload)
+        // console.log("payload : ", payload)
         // 🔥 แยก customer / employee
         if (payload.role === "CUSTOMER") {
             const user = await prisma.customer.findUnique({

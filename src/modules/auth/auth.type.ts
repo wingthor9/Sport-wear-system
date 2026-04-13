@@ -8,6 +8,17 @@ export type CustomerRegisterInput = {
     email: string
     password: string
     phone: string
+    gender?: string
+    address?: string
+    isActive?: boolean
+}
+export type  CustomerUpdateInput = {
+    customer_name?: string
+    email?: string
+    phone?: string
+    gender?: string
+    address?: string
+    isActive?: boolean
 }
 
 

@@ -5,7 +5,7 @@ import { getSearchParam } from "@/utils/search"
 import { getSortingParams } from "@/utils/sorting"
 import { Prisma } from "@prisma/client"
 import { NextRequest } from "next/server"
-import { UpdateCustomerInput } from "./customer.type"
+import {  UpdateCustomerInput } from "./customer.type"
 import { BadRequestError, errorResponse, ForbiddenError, NotFoundError, successResponse, UnauthorizedError } from "@/utils/response"
 
 export const customerController = {
@@ -62,6 +62,7 @@ export const customerController = {
         }
     },
 
+
     async updateCustomer(req: NextRequest, id: string) {
         try {
             const body: UpdateCustomerInput = await req.json()
@@ -93,7 +94,7 @@ export const customerController = {
     async updateCustomerStatus(req: NextRequest, id: string) {
         try {
             const result = await customerService.updateCustomerStatus(id);
-            return successResponse( result, "Customer status updated successfully", 200 );
+            return successResponse(result, "Customer status updated successfully", 200);
         } catch (error) {
             console.log(error)
             if (
@@ -107,6 +108,4 @@ export const customerController = {
             return errorResponse("Internal Server Error", 500)
         }
     }
-
-
 }

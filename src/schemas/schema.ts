@@ -1,16 +1,16 @@
 import { z } from "zod"
+import CustomerForm from '../app/features/customer/customer-form';
 
-// Product Schema
+/* ----------------------------- Start Product Schema ----------------------------- */
 export const productSchema = z.object({
-  product_name: z.string().min(1),
-  price: z.number(),
-  stock_qty: z.number(),
-  category_id: z.string()
+  product_name: z.string().min(1, "Product name is required"),
+  price: z.string().min(1, "Stock quantity is required"),
+  stock_qty: z.string().min(1, "Stock quantity is required"),
+  category_id: z.string().min(1, "Category is required"),
+  description: z.string().optional()
 })
-export type ProductInput = z.infer<typeof productSchema>
-export const productUpdateSchema = productSchema.partial()
-export type ProductUpdateInput = z.infer<typeof productUpdateSchema>
-
+export type ProductFormValues = z.infer<typeof productSchema>
+/* ----------------------------- Start Product Schema ----------------------------- */
 
 
 // Category Schema
@@ -29,15 +29,27 @@ export type CategoryUpdateInput = z.infer<typeof categoryUpdateSchema>
 
 
 // Customer Schema
-export const customerSchema = z.object({
-  customer_name: z.string().min(1),
-  phone: z.string().min(5),
+
+export const customerAddSchema = z.object({
+  customer_name: z.string().min(1, "Customer name is required"),
+  phone: z.string().min(5, "Phone number is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  email: z.string().email(),
   address: z.string().optional(),
-  email: z.string().email().optional()
+  gender: z.string().optional(),
+  isActive: z.boolean().optional()
 })
-export type CustomerInput = z.infer<typeof customerSchema>
-export const customerUpdateSchema = customerSchema.partial()
-export type CustomerUpdateInput = z.infer<typeof customerUpdateSchema>
+export type CustomerAddFormValues = z.infer<typeof customerAddSchema>
+
+export const customerEditSchema = z.object({
+  customer_name: z.string().min(1).optional(),
+  phone: z.string().min(5).optional(),
+  email: z.string().email().optional(),
+  address: z.string().optional(),
+  gender: z.string().optional(),
+  isActive: z.boolean().optional(),
+})
+export type customerEditFormValues = z.infer<typeof customerEditSchema>
 
 
 
@@ -134,13 +146,14 @@ export const customerRegisterSchema = z.object({
   password: z.string(),
   email: z.string().email(),
   gender: z.string().optional(),
-  address: z.string().optional()
+  address: z.string().optional(),
+  isActive: z.boolean().optional()
 })
-export type CustomerRegisterInput = z.infer<typeof customerRegisterSchema>
+export type CustomerFormValues = z.infer<typeof customerRegisterSchema>
 
 
 // auth admin login schema
-export const adminAuthSchema = z.object({ 
-  username: z.string(),password: z.string()
+export const adminAuthSchema = z.object({
+  username: z.string(), password: z.string()
 })
 export type AdminAuthInput = z.infer<typeof adminAuthSchema>

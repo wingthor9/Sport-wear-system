@@ -28,8 +28,8 @@ export type ProductImage = {
 export type Product = {
   product_id: string
   product_name: string
-  price: number
-  stock_qty: number
+  price: string
+  stock_qty: string
   description?: string
   category_id: string
   images: ProductImage[]

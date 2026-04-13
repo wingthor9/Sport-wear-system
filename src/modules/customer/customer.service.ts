@@ -1,7 +1,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
-import { UpdateCustomerInput } from "./customer.type"
+import {  UpdateCustomerInput } from "./customer.type"
 import { BadRequestError, NotFoundError } from "@/utils/response"
 
 export const customerService = {
@@ -32,6 +32,8 @@ export const customerService = {
         return customer
 
     },
+
+
 
 
     async updateCustomer(id: string, data: UpdateCustomerInput) {

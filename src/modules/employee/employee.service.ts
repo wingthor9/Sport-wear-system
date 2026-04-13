@@ -35,7 +35,7 @@ export const employeeService = {
 
 
     async updateEmployee(id: string, data: UpdateEmployeeInput) {
-        const employee = await  prisma.employee.update({
+        const employee = await prisma.employee.update({
             where: { employee_id: id },
             data
         })
@@ -60,6 +60,22 @@ export const employeeService = {
             }
         })
 
+    },
+
+    async updateEmployeeStatus(id: string) {
+        const employee = await prisma.employee.findUnique({
+            where: { employee_id: id }
+        });
+        if (!employee) {
+            throw new NotFoundError("Employee not found");
+        }
+        const updatedEmployee = await prisma.employee.update({
+            where: { employee_id: id },
+            data: {
+                isActive: !employee.isActive
+            }
+        });
+        return updatedEmployee;
     }
 
 }

@@ -1,18 +1,16 @@
 "use client"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { authApi, categoryApi, customerApi, employeeApi, orderApi, productApi, purchaseApi, refundApi, saleApi, supplierApi } from "./api"
-import { LoginInput, RegisterInput } from "./types"
+
+import { adminApi, adminAuthApi, categoryApi, customerApi,  orderApi, productApi, purchaseApi, refundApi, saleApi, supplierApi } from "./api"
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import { CreateCustomerInput, UpdateCustomerInput } from "@/modules/customer/customer.type"
-import { CreateEmployeeInput, Employee, UpdateEmployeeInput } from "@/modules/employee/employee.type"
+import { CreateEmployeeInput, UpdateEmployeeInput } from "@/modules/employee/employee.type"
 import { Category, UpdateCategoryInput } from "@/modules/category/category.type"
 import { CreateSupplierInput, UpdateSupplierInput } from "@/modules/supplier/supplier.type"
 import { CreatePurchaseOrderInput, UpdatePurchaseOrderInput } from "@/modules/purchase/purchase.type"
 import { CreateOrderInput, UpdateOrderStatusInput } from "@/modules/order/order.types"
 import { CreateSaleInput } from "@/modules/sale/sale.type"
 import { CreateRefundInput } from "@/modules/refund/refund.type"
-import { ForgotPasswordInput, ResetPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
+import { CustomerRegisterInput, ForgotPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
 
 
 export type UseGetParams = {
@@ -30,7 +28,7 @@ export type UseGetParams = {
 //     const login = async (data: LoginInput) => {
 //         try {
 //             setLoading(true)
-//             await authApi.login(data)
+//             await adminAuthApi.login(data)
 //             router.push("/admin/dashboard")
 //         } catch (error) {
 //             console.log(error)
@@ -45,7 +43,7 @@ export type UseGetParams = {
 //     const register = async (data: RegisterInput) => {
 //         try {
 //             setLoading(true)
-//             await authApi.register(data)
+//             await adminAuthApi.register(data)
 //             router.push("/auth/login")
 //         } finally {
 //             setLoading(false)
@@ -77,7 +75,7 @@ export const useAuth = () => {
 export const useAdminMe = () => {
     return useQuery({
         queryKey: ["me"],
-        queryFn: authApi.adminMe,
+        queryFn: adminAuthApi.adminMe,
         retry: false,
         staleTime: 1000 * 60 * 5,
         refetchOnMount: false,
@@ -89,7 +87,7 @@ export const useAdminLogin = () => {
     const qc = useQueryClient()
 
     return useMutation({
-        mutationFn: authApi.adminLogin,
+        mutationFn: adminAuthApi.adminLogin,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["me"] })
         },
@@ -98,26 +96,26 @@ export const useAdminLogin = () => {
 
 export const useAdminForgotPassword = () => {
     return useMutation({
-        mutationFn: (data: ForgotPasswordInput) => authApi.adminForgotPassword(data),
+        mutationFn: (data: ForgotPasswordInput) => adminAuthApi.adminForgotPassword(data),
     })
 }
 
 export const useAdminVerifyOtp = () => {
     return useMutation({
-        mutationFn: (data: VerifyOTPInput) => authApi.adminVerifyOtp(data),
+        mutationFn: (data: VerifyOTPInput) => adminAuthApi.adminVerifyOtp(data),
     })
 }
 
 export const useAdminResendOTP = () => {
     return useMutation({
-        mutationFn: (data: ForgotPasswordInput) => authApi.adminResendOtp(data),
+        mutationFn: (data: ForgotPasswordInput) => adminAuthApi.adminResendOtp(data),
     })
 }
 
 export const useAdminResetPassword = () => {
     const qc = useQueryClient()
     return useMutation({
-        mutationFn: authApi.adminResetPassword,
+        mutationFn: adminAuthApi.adminResetPassword,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["me"] })
         }
@@ -138,7 +136,7 @@ export const useAdminResetPassword = () => {
 //         Error,
 //         ResetPasswordInput
 //     >({
-//         mutationFn: (data) => authApi.adminResetPassword(data),
+//         mutationFn: (data) => adminAuthApi.adminResetPassword(data),
 
 //         onSuccess: () => {
 //             qc.invalidateQueries({ queryKey: ["me"] })
@@ -151,7 +149,7 @@ export const useAdminRegister = () => {
     const qc = useQueryClient()
 
     return useMutation({
-        mutationFn: authApi.adminRegister,
+        mutationFn: adminAuthApi.adminRegister,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["me"] })
         },
@@ -162,7 +160,7 @@ export const useAdminLogout = () => {
     const qc = useQueryClient()
 
     return useMutation({
-        mutationFn: authApi.adminLogout,
+        mutationFn: adminAuthApi.adminLogout,
         onSuccess: () => {
             qc.removeQueries({ queryKey: ["me"] })
             window.location.href = "/login"
@@ -173,9 +171,10 @@ export const useAdminLogout = () => {
 
 export const useAdminRefresh = () => {
     return useMutation({
-        mutationFn: authApi.adminRefresh,
+        mutationFn: adminAuthApi.adminRefresh,
     })
 }
+
 
 
 // -------------------------------------------------------- Product start -----------------------------------------------------------------------
@@ -306,11 +305,9 @@ export const useGetCustomer = (id: string) => {
 
 export const useCreateCustomer = () => {
     const qc = useQueryClient()
-
     return useMutation({
-        mutationFn: (data: CreateCustomerInput) =>
+        mutationFn: (data: CustomerRegisterInput) =>
             customerApi.create(data),
-
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["customers"] })
         },
@@ -362,22 +359,22 @@ export const useUpdateCustomerStatus = () => {
 // -------------------------------------------------------- Admin start -----------------------------------------------------------------------
 
 
-export const useGetEmployees = () => {
+export const useGetAdmin = () => {
     return useQuery({
-        queryKey: ["employees"],
-        queryFn: employeeApi.getAll,
+        queryKey: ["admin"],
+        queryFn: adminApi.getAll,
     })
 }
 
-export const useCreateEmployee = () => {
+export const useCreateAdmin = () => {
     const qc = useQueryClient()
 
     return useMutation({
         mutationFn: (data: CreateEmployeeInput) =>
-            employeeApi.create(data),
+            adminApi.create(data),
 
         onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["employees"] })
+            qc.invalidateQueries({ queryKey: ["admin"] })
         },
     })
 }
@@ -386,26 +383,44 @@ export const useUpdateEmployee = () => {
     const qc = useQueryClient()
 
     return useMutation({
-        mutationFn: ({ id, data, }: { id: string, data: UpdateEmployeeInput }) => employeeApi.update(id, data),
+        mutationFn: ({ id, data, }: { id: string, data: UpdateEmployeeInput }) => adminApi.update(id, data),
         onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["employees"] })
+            qc.invalidateQueries({ queryKey: ["admin"] })
         },
     })
 }
 
-export const useDeleteEmployee = () => {
-    const qc = useQueryClient()
+// export const useDeleteEmployee = () => {
+//     const qc = useQueryClient()
 
+//     return useMutation({
+//         mutationFn: (id: string) => employeeApi.delete(id),
+//         onSuccess: () => {
+//             qc.invalidateQueries({ queryKey: ["employees"] })
+//         },
+//     })
+// }
+
+
+// -------------------------------------------------------- Admin end -----------------------------------------------------------------------
+
+
+// -------------------------------------------------------- Supplier start -----------------------------------------------------------------------
+
+
+export const useAdminUpdateStatus = () => {
+    const qc = useQueryClient()
     return useMutation({
-        mutationFn: (id: string) => employeeApi.delete(id),
+        mutationFn: adminApi.updateStatus,
         onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["employees"] })
+            qc.invalidateQueries({ queryKey: ["me"] })
         },
     })
 }
 
 
 // -------------------------------------------------------- Admin end -----------------------------------------------------------------------
+
 
 
 // -------------------------------------------------------- Supplier start -----------------------------------------------------------------------

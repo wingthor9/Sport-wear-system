@@ -16,16 +16,16 @@ export type GetParams = {
   page?: number
   limit?: number
   search?: string
-  orderBy?: string
+  orderBy?: string 
   order?: "asc" | "desc"
 }
 
-// -------------------------------------------------------- Auth start -----------------------------------------------------------------------
+// --------------------------------------------------------Admin Auth start -----------------------------------------------------------------------
 
-export const authApi = {
+export const adminAuthApi = {
   adminLogin: async (data: LoginInput) => {
     // console.log("login data : ",data)
-    const res = await axiosInstance.post("auth/employee/login", data)
+    const res = await axiosInstance.post("auth/admin/login", data)
     return res.data
   },
 
@@ -74,9 +74,74 @@ adminMe: async () => {
       throw err
     }
   },
+
+  
+
 }
 
-// -------------------------------------------------------- Auth end -----------------------------------------------------------------------
+// -------------------------------------------------------- Admin Auth end -----------------------------------------------------------------------
+
+
+
+// -------------------------------------------------------- Customer Auth start -----------------------------------------------------------------------
+
+
+export const customerAuthApi = {
+  customerLogin: async (data: LoginInput) => {
+    const res = await axiosInstance.post("/auth/customer/login", data)
+    return res.data
+  },
+  customerRegister: async (data: RegisterInput) => {
+    const res = await axiosInstance.post("/auth/customer/register", data)
+    return res.data
+  },
+  customerLogout: async () => {
+    await axiosInstance.post("/auth/customer/logout")
+  },
+  customerRefresh: async () => {
+    const res = await axiosInstance.post("/auth/refresh")
+    return res.data
+  },
+  customerMe: async () => {
+    try {
+      const res = await axiosInstance.get("/auth/me")
+      return res.data
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        return null
+      }
+      throw err
+    }
+  },
+
+  customerForgotPassword: async (data: ForgotPasswordInput) => {
+    const res = await axiosInstance.post("/auth/customer/forgot-password", data)
+    return res.data
+  },
+
+  customerVerifyOtp: async (data: VerifyOTPInput) => {
+    const res = await axiosInstance.post("/auth/customer/verify-otp", data)
+    return res.data
+  },
+
+  customerResendOtp: async (data: ForgotPasswordInput) => {
+    const res = await axiosInstance.post("/auth/customer/resend-otp", data)
+    return res.data
+  },
+
+  customerResetPassword: async (data: ResetPasswordInput) => {
+    const res = await axiosInstance.post("/auth/customer/reset-password", data)
+    return res.data
+  },
+  
+}
+
+
+
+// -------------------------------------------------------- Customer Auth end -----------------------------------------------------------------------
+
+
+
 
 
 
@@ -187,7 +252,7 @@ export const customerApi = {
   },
 
   create: async (data: CreateCustomerInput): Promise<Customer> => {
-    const res = await axiosInstance.post("/customers", data)
+    const res = await axiosInstance.post("/auth/customer/register", data)
     return res.data.data.data
   },
 
@@ -214,7 +279,7 @@ updateStatus: async (id: string) => {
 // -------------------------------------------------------- Employee start -----------------------------------------------------------------------
 
 
-export const employeeApi = {
+export const adminApi = {
 
   getAll: async (): Promise<Employee[]> => {
     const res = await axiosInstance.get("/employees")
@@ -239,9 +304,13 @@ export const employeeApi = {
     return res.data.data.data
   },
 
-  delete: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/employees/${id}`)
-  },
+  // delete: async (id: string): Promise<void> => {
+  //   await axiosInstance.delete(`/employees/${id}`)
+  // },
+  updateStatus: async (id: string) => {
+  const res = await axiosInstance.patch(`/employees/${id}`)
+  return res.data.data
+}
 }
 
 // -------------------------------------------------------- Employee end -----------------------------------------------------------------------

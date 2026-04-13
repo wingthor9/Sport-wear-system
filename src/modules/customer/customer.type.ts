@@ -23,8 +23,7 @@ export type CreateCustomerInput = {
     email: string
     phone: string
     password: string
-    gender?: string
-    address?: string
+
 }
 
 export type UpdateCustomerInput = {
@@ -72,7 +71,7 @@ export interface Customer {
   phone: string;
   address: string;
   city: string;
-  postalCode: string;
+  gender: string;
   joinDate: string;
   lastOrderDate: string;
   totalOrders: number;

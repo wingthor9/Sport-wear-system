@@ -40,7 +40,7 @@ export const employeeController = {
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
             }
-return errorResponse("Internal Server Error", 500)
+            return errorResponse("Internal Server Error", 500)
         }
     },
 
@@ -53,7 +53,7 @@ return errorResponse("Internal Server Error", 500)
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
             }
-return errorResponse("Internal Server Error", 500)
+            return errorResponse("Internal Server Error", 500)
         }
     },
 
@@ -68,22 +68,40 @@ return errorResponse("Internal Server Error", 500)
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
             }
-return errorResponse("Internal Server Error", 500)
+            return errorResponse("Internal Server Error", 500)
         }
     },
 
-    async deleteEmployee(id: string) {
+    // async deleteEmployee(id: string) {
+    //     try {
+    //         await employeeService.deleteEmployee(id)
+    //         return successResponse(null, "Delete employee successfully", 200)
+    //     } catch (error) {
+    //         console.log(error)
+    //         if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+    //             return errorResponse(error.message, error.statusCode);
+    //         }
+
+    //     }
+
+    // }
+
+    async updateEmployeeStatus(req: NextRequest, id: string) {
         try {
-            await employeeService.deleteEmployee(id)
-            return successResponse(null, "Delete employee successfully", 200)
+            const result = await employeeService.updateEmployeeStatus(id);
+            return successResponse(result, "Employee status updated successfully", 200);
         } catch (error) {
             console.log(error)
-            if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+            if (
+                error instanceof BadRequestError ||
+                error instanceof NotFoundError ||
+                error instanceof ForbiddenError ||
+                error instanceof UnauthorizedError
+            ) {
                 return errorResponse(error.message, error.statusCode);
             }
-
+            return errorResponse("Internal Server Error", 500)
         }
-
     }
 
 }
