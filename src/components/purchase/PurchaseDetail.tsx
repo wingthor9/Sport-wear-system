@@ -1,7 +1,7 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow} from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { PurchaseOrder } from "@/modules/purchase/purchase.type"
 import { formatDate } from "@/utils/FormatDate"
@@ -74,8 +74,8 @@ export function PurchaseDetail({ purchase, isLoading }: Props) {
                 <Table>
                     <TableHeader>
                         <TableRow>
+                            <TableHead>NO:</TableHead>
                             <TableHead>Product</TableHead>
-                            {/* <TableHead>SKU</TableHead> */}
                             <TableHead className="text-right">Qty</TableHead>
                             <TableHead className="text-right">Price</TableHead>
                             <TableHead className="text-right">Total</TableHead>
@@ -83,15 +83,15 @@ export function PurchaseDetail({ purchase, isLoading }: Props) {
                     </TableHeader>
 
                     <TableBody>
-                        {purchase.purchase_details?.map((item) => (
+                        {purchase.purchase_details?.map((item,index) => (
                             <TableRow key={item.purchase_detail_id}>
+                                <TableCell>
+                                    {index + 1}
+                                </TableCell>
                                 <TableCell>
                                     {item.product?.product_name}
                                 </TableCell>
 
-                                {/* <TableCell>
-                                    {item.product?.product}
-                                </TableCell> */}
 
                                 <TableCell className="text-right">
                                     {item.quantity}
@@ -110,16 +110,14 @@ export function PurchaseDetail({ purchase, isLoading }: Props) {
                 </Table>
 
                 {/* ---------------- TOTAL ---------------- */}
-                <div className="p-4 border-t flex justify-end">
-                    <div className="w-64 space-y-2 text-sm">
-                        <div className="flex justify-between">
-                            <span className="text-gray-500">Total:</span>
-                            <span className="font-bold text-lg">
-                                {formatCurrency(total)}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                <TableFooter className="flex justify-end items-center">
+                    <TableRow>
+                        <TableHead className="text-right font-bold text-lg">Total: </TableHead>
+                        <TableHead className="text-right font-bold text-lg">
+                            {formatCurrency(total)} KIP
+                        </TableHead>
+                    </TableRow>
+                </TableFooter>
             </Card>
 
         </div>

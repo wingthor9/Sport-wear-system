@@ -12,7 +12,11 @@ export const importService = {
             ...options,
             include: {
                 employee: true,
-                purchase: true,
+                purchase: {
+                    include: {
+                        supplier: true
+                    }
+                },
                 import_details: {
                     include: {
                         product: true
@@ -41,6 +45,7 @@ export const importService = {
     },
 
     async createImport(data: CreateImportInput, userId: string) {
+        console.log("data for import",data)
         return prisma.$transaction(async (tx) => {
 
             // 🔍 1. หา purchase

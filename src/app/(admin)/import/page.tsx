@@ -8,6 +8,7 @@ import { Import } from "@/modules/import/import.type"
 import { ImportToolbar } from "@/components/import/ImportToolbar"
 import { ImportTable } from "@/components/import/ImportTable"
 import { ImportFormDialog } from "@/components/import/ImportFormDialog"
+import { ImportDetail } from "@/components/import/ImportDetailDialog"
 
 
 
@@ -47,7 +48,7 @@ export default function ImportPage() {
             <ImportTable
                 imports={data?.data ?? []}
                 isLoading={isLoading}
-                onView={(i: Import) => {
+                onView={(i) => {
                     setSelected(i)
                     setOpenDetail(true)
                 }}

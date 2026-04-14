@@ -13,3 +13,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return importController.deleteImport(id)
 
 }
+
+export async function POST(req: NextRequest) {
+    return importController.createImport(req)
+
+}

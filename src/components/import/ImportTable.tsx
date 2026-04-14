@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Eye, Trash2 } from "lucide-react"
 import { Import } from "@/modules/import/import.type"
+import { formatDate } from "@/utils/FormatDate"
 
 type Props = {
     imports: Import[]
     isLoading: boolean
-    onEdit: (i: Import) => void
     onDelete: (id: string) => void
     onView: (i: Import) => void
 
@@ -38,7 +38,7 @@ export function ImportTable({ imports, isLoading, onView, onDelete }: Props) {
                             <TableCell>{i.import_id}</TableCell>
                             <TableCell>{i.purchase?.purchase_id}</TableCell>
                             <TableCell>
-                                {new Date(i.import_date).toLocaleDateString("en-GB")}
+                           {formatDate( i.import_date)}
                             </TableCell>
                             <TableCell>{i.employee?.employee_name}</TableCell>
 

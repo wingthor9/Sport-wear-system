@@ -16,16 +16,12 @@ export type ImportDetail = {
 
 export type Import = {
     import_id: string
-    import_date: string
-
+    import_date?: Date
     purchase_id: string
-    employee_id: string
-
+    employee_id?: string
     purchase?: PurchaseOrder
     employee?: Employee
-
     import_details?: ImportDetail[]
-
     createdAt?: string
     updatedAt?: string
 }
@@ -38,6 +34,7 @@ export type CreateImportDetailInput = {
 
 export type CreateImportInput = {
     purchase_id: string
-    employee_id: string
+    employee_id?: string
+    import_date?: Date
     import_details: CreateImportDetailInput[]
 }
