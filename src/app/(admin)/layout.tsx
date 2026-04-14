@@ -21,6 +21,7 @@ const navigation: NavItem[] = [
     { name: "Point of Sale", href: "/pos", icon: ShoppingCart, roles: ["ADMIN", "STAFF"] },
     { name: "Orders", href: "/order", icon: ShoppingBag, roles: ["ADMIN", "STAFF"] },
     { name: "Purchases", href: "/purchase", icon: ShoppingBag, roles: ["ADMIN"] },
+    { name: "Imports", href: "/import", icon: ShoppingBag, roles: ["ADMIN"] },
     { name: "Payments", href: "/payment", icon: CreditCard, roles: ["ADMIN"] },
     { name: "Product", href: "/product", icon: Package, roles: ["ADMIN"] },
     { name: "Categories", href: "/category", icon: Store, roles: ["ADMIN"] },

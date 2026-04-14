@@ -7,14 +7,11 @@ export type ImportDetail = {
     import_detail_id: string
     quantity: number
     cost_price: number
-
     import_id: string
     product_id: string
-
     product?: Product
-
-    createdAt: string
-    updatedAt: string
+    createdAt?: string
+    updatedAt?: string
 }
 
 export type Import = {
@@ -29,8 +26,8 @@ export type Import = {
 
     import_details?: ImportDetail[]
 
-    createdAt: string
-    updatedAt: string
+    createdAt?: string
+    updatedAt?: string
 }
 
 export type CreateImportDetailInput = {
