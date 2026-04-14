@@ -2,31 +2,14 @@
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu,  DropdownMenuContent,  DropdownMenuItem,  DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
 import { ArrowUpDown, Plus } from "lucide-react"
+import { PropsTable } from "../Type"
 
-/* ----------------------------- Types ----------------------------- */
-
-export type Table = {
-    search: string
-    setSort: (field: string) => void
-    setOrder: (order: "asc" | "desc") => void
-    setSearch: (search: string) => void
-}
-
-export type Props = {
-    table: Table
-    onAdd: () => void
-}
 
 /* ----------------------------- Component ----------------------------- */
 
-export function CustomerToolbar({ table, onAdd }: Props) {
+export function CustomerToolbar({ table, onAdd }: PropsTable) {
 
     const setSort = (sort: string, order: "asc" | "desc") => {
         table.setSort(sort)

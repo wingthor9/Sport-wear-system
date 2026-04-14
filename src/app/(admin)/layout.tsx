@@ -19,13 +19,16 @@ type NavItem = {
 const navigation: NavItem[] = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN", "STAFF"] },
     { name: "Point of Sale", href: "/pos", icon: ShoppingCart, roles: ["ADMIN", "STAFF"] },
-    { name: "Orders", href: "/orders", icon: ShoppingBag, roles: ["ADMIN", "STAFF"] },
-    { name: "Payments", href: "/payments", icon: CreditCard, roles: ["ADMIN"] },
-    { name: "Product", href: "/products", icon: Package, roles: ["ADMIN"] },
-    { name: "Customers", href: "/customers", icon: Users, roles: ["ADMIN"] },
-    { name: "Employees", href: "/employees", icon: UserCog, roles: ["ADMIN"] },
-    { name: "Reports", href: "/reports", icon: BarChart3, roles: ["ADMIN"] },
-    { name: "Settings", href: "/settings", icon: Settings, roles: ["ADMIN"] },
+    { name: "Orders", href: "/order", icon: ShoppingBag, roles: ["ADMIN", "STAFF"] },
+    { name: "Purchases", href: "/purchase", icon: ShoppingBag, roles: ["ADMIN"] },
+    { name: "Payments", href: "/payment", icon: CreditCard, roles: ["ADMIN"] },
+    { name: "Product", href: "/product", icon: Package, roles: ["ADMIN"] },
+    { name: "Categories", href: "/category", icon: Store, roles: ["ADMIN"] },
+    { name: "Suppliers", href: "/supplier", icon: Store, roles: ["ADMIN"] },
+    { name: "Customers", href: "/customer", icon: Users, roles: ["ADMIN"] },
+    { name: "Employees", href: "/employee", icon: UserCog, roles: ["ADMIN"] },
+    { name: "Reports", href: "/report", icon: BarChart3, roles: ["ADMIN"] },
+    { name: "Settings", href: "/setting", icon: Settings, roles: ["ADMIN"] },
 ]
 
 export default function AdminLayout({ children, }: { children: React.ReactNode }) {
@@ -51,6 +54,8 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
 
     }, [user, isLoading, pathname, router])
     if (isLoading) return null
+
+    // console.log("user : ",user)
 
     return (
         <div className="flex h-screen bg-gray-50 ">

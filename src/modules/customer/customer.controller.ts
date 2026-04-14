@@ -5,7 +5,7 @@ import { getSearchParam } from "@/utils/search"
 import { getSortingParams } from "@/utils/sorting"
 import { Prisma } from "@prisma/client"
 import { NextRequest } from "next/server"
-import {  UpdateCustomerInput } from "./customer.type"
+import {  CreateCustomerInput, UpdateCustomerInput } from "./customer.type"
 import { BadRequestError, errorResponse, ForbiddenError, NotFoundError, successResponse, UnauthorizedError } from "@/utils/response"
 
 export const customerController = {
@@ -53,6 +53,20 @@ export const customerController = {
         try {
             const customer = await customerService.getCustomer(id)
             return successResponse(customer, "Get customer successfully", 200)
+        } catch (error) {
+            console.log(error)
+            if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+                return errorResponse(error.message, error.statusCode);
+            }
+            return errorResponse("Internal Server Error", 500)
+        }
+    },
+
+    async createCustomer(req: NextRequest) {
+        try {
+            const body: CreateCustomerInput = await req.json()
+            const customer = await customerService.createCustomer(body)
+            return successResponse(customer, "Create customer successfully", 201)
         } catch (error) {
             console.log(error)
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {

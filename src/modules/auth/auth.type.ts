@@ -10,7 +10,6 @@ export type CustomerRegisterInput = {
     phone: string
     gender?: string
     address?: string
-    isActive?: boolean
 }
 export type  CustomerUpdateInput = {
     customer_name?: string
@@ -18,7 +17,6 @@ export type  CustomerUpdateInput = {
     phone?: string
     gender?: string
     address?: string
-    isActive?: boolean
 }
 
 

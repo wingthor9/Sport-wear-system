@@ -11,12 +11,15 @@ import { CreateOrderInput, Order, UpdateOrderStatusInput } from "@/modules/order
 import { CreateSaleInput, Sale } from "@/modules/sale/sale.type"
 import { CreateRefundInput, Refund } from "@/modules/refund/refund.type"
 import { ForgotPasswordInput, ResetPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
+import { isAxiosError } from "axios"
+import { CreateImportInput, Import } from "@/modules/import/import.type"
+
 
 export type GetParams = {
   page?: number
   limit?: number
   search?: string
-  orderBy?: string 
+  orderBy?: string
   order?: "asc" | "desc"
 }
 
@@ -63,19 +66,22 @@ export const adminAuthApi = {
     return res.data
   },
 
-adminMe: async () => {
+
+  adminMe: async () => {
     try {
       const res = await axiosInstance.get("/auth/me")
       return res.data
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        return null
+    } catch (err: unknown) {
+      if (isAxiosError(err)) {
+        if (err.response?.status === 401) {
+          return null
+        }
       }
       throw err
     }
-  },
+  }
 
-  
+
 
 }
 
@@ -106,9 +112,11 @@ export const customerAuthApi = {
     try {
       const res = await axiosInstance.get("/auth/me")
       return res.data
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        return null
+    } catch (err: unknown) {
+      if (isAxiosError(err)) {
+        if (err.response?.status === 401) {
+          return null
+        }
       }
       throw err
     }
@@ -133,7 +141,7 @@ export const customerAuthApi = {
     const res = await axiosInstance.post("/auth/customer/reset-password", data)
     return res.data
   },
-  
+
 }
 
 
@@ -157,19 +165,19 @@ export const productApi = {
       totalPages: number
     }
   }> => {
-    const res = await axiosInstance.get("/products", {
+    const res = await axiosInstance.get("/product", {
       params
     })
     return res.data.data
   },
 
   getOne: async (id: string): Promise<Product> => {
-    const res = await axiosInstance.get(`/products/${id}`)
+    const res = await axiosInstance.get(`/product/${id}`)
     return res.data.data.data
   },
 
   create: async (data: FormData): Promise<Product> => {
-    const res = await axiosInstance.post("/products", data, {
+    const res = await axiosInstance.post("/product", data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -178,7 +186,7 @@ export const productApi = {
   },
 
   update: async (id: string, data: FormData): Promise<Product> => {
-    const res = await axiosInstance.put(`/products/${id}`, data, {
+    const res = await axiosInstance.put(`/product/${id}`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -187,7 +195,7 @@ export const productApi = {
   },
 
   delete: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/products/${id}`)
+    await axiosInstance.delete(`/product/${id}`)
   },
 }
 
@@ -199,27 +207,27 @@ export const productApi = {
 
 export const categoryApi = {
   getAll: async (): Promise<Category[]> => {
-    const res = await axiosInstance.get("/categories")
+    const res = await axiosInstance.get("/category")
     return res.data.data.data
   },
 
   getOne: async (id: string): Promise<Category> => {
-    const res = await axiosInstance.get(`/categories/${id}`)
+    const res = await axiosInstance.get(`/category/${id}`)
     return res.data.data.data
   },
 
   create: async (data: CreateCategoryInput): Promise<Category> => {
-    const res = await axiosInstance.post("/categories", data)
+    const res = await axiosInstance.post("/category", data)
     return res.data.data.data
   },
 
   update: async (id: string, data: UpdateCategoryInput): Promise<Category> => {
-    const res = await axiosInstance.put(`/categories/${id}`, data)
+    const res = await axiosInstance.put(`/category/${id}`, data)
     return res.data.data.data
   },
 
   delete: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/categories/${id}`)
+    await axiosInstance.delete(`/category/${id}`)
   },
 }
 
@@ -239,7 +247,7 @@ export const customerApi = {
       totalPages: number
     }
   }> => {
-    const res = await axiosInstance.get("/customers", {
+    const res = await axiosInstance.get("/customer", {
       params
     })
 
@@ -247,17 +255,17 @@ export const customerApi = {
   },
 
   getOne: async (id: string): Promise<Customer> => {
-    const res = await axiosInstance.get(`/customers/${id}`)
+    const res = await axiosInstance.get(`/customer/${id}`)
     return res.data.data.data
   },
 
   create: async (data: CreateCustomerInput): Promise<Customer> => {
-    const res = await axiosInstance.post("/auth/customer/register", data)
+    const res = await axiosInstance.post("/customer", data)
     return res.data.data.data
   },
 
   update: async (id: string, data: UpdateCustomerInput): Promise<Customer> => {
-    const res = await axiosInstance.put(`/customers/${id}`, data)
+    const res = await axiosInstance.put(`/customer/${id}`, data)
     return res.data.data.data
   },
 
@@ -265,10 +273,10 @@ export const customerApi = {
   //   await axiosInstance.delete(`/customers/${id}`)
   // },
 
-updateStatus: async (id: string) => {
-  const res = await axiosInstance.patch(`/customers/${id}`)
-  return res.data.data
-}
+  updateStatus: async (id: string) => {
+    const res = await axiosInstance.patch(`/customer/${id}`)
+    return res.data.data
+  }
 }
 
 
@@ -282,17 +290,17 @@ updateStatus: async (id: string) => {
 export const adminApi = {
 
   getAll: async (): Promise<Employee[]> => {
-    const res = await axiosInstance.get("/employees")
+    const res = await axiosInstance.get("/employee")
     return res.data.data.data
   },
 
   getById: async (id: string): Promise<Employee> => {
-    const res = await axiosInstance.get(`/employees/${id}`)
+    const res = await axiosInstance.get(`/employee/${id}`)
     return res.data.data.data
   },
 
   create: async (data: CreateEmployeeInput): Promise<Employee> => {
-    const res = await axiosInstance.post("/employees", data)
+    const res = await axiosInstance.post("/employee", data)
     return res.data.data.data
   },
 
@@ -300,7 +308,7 @@ export const adminApi = {
     id: string,
     data: UpdateEmployeeInput
   ): Promise<Employee> => {
-    const res = await axiosInstance.put(`/employees/${id}`, data)
+    const res = await axiosInstance.put(`/employee/${id}`, data)
     return res.data.data.data
   },
 
@@ -308,9 +316,9 @@ export const adminApi = {
   //   await axiosInstance.delete(`/employees/${id}`)
   // },
   updateStatus: async (id: string) => {
-  const res = await axiosInstance.patch(`/employees/${id}`)
-  return res.data.data
-}
+    const res = await axiosInstance.patch(`/employee/${id}`)
+    return res.data.data
+  }
 }
 
 // -------------------------------------------------------- Employee end -----------------------------------------------------------------------
@@ -322,18 +330,33 @@ export const adminApi = {
 
 export const supplierApi = {
 
-  getAll: async (): Promise<Supplier[]> => {
-    const res = await axiosInstance.get("/suppliers")
-    return res.data.data.data
+  // getAll: async (): Promise<Supplier[]> => {
+  //   const res = await axiosInstance.get("/suppliers")
+  //   return res.data.data.data
+  // },
+
+  getAll: async (params?: GetParams): Promise<{
+    data: Supplier[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/supplier", {
+      params
+    })
+    return res.data.data
   },
 
   getById: async (id: string): Promise<Supplier> => {
-    const res = await axiosInstance.get(`/suppliers/${id}`)
+    const res = await axiosInstance.get(`/supplier/${id}`)
     return res.data.data.data
   },
 
   create: async (data: CreateSupplierInput): Promise<Supplier> => {
-    const res = await axiosInstance.post("/suppliers", data)
+    const res = await axiosInstance.post("/supplier", data)
     return res.data.data.data
   },
 
@@ -341,12 +364,12 @@ export const supplierApi = {
     id: string,
     data: UpdateSupplierInput
   ): Promise<Supplier> => {
-    const res = await axiosInstance.put(`/suppliers/${id}`, data)
+    const res = await axiosInstance.put(`/supplier/${id}`, data)
     return res.data.data.data
   },
 
   delete: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/suppliers/${id}`)
+    await axiosInstance.delete(`/supplier/${id}`)
   }
 }
 
@@ -360,18 +383,33 @@ export const supplierApi = {
 
 export const purchaseApi = {
 
-  getAll: async (): Promise<PurchaseOrder[]> => {
-    const res = await axiosInstance.get("/purchase-orders")
-    return res.data.data.data
+  // getAlls: async (): Promise<PurchaseOrder[]> => {
+  //   const res = await axiosInstance.get("/purchase-orders")
+  //   return res.data.data.data
+  // },
+
+  getAll: async (params?: GetParams): Promise<{
+    data: PurchaseOrder[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/purchase", {
+      params
+    })
+    return res.data.data
   },
 
   getById: async (id: string): Promise<PurchaseOrder> => {
-    const res = await axiosInstance.get(`/purchase-orders/${id}`)
+    const res = await axiosInstance.get(`/purchase/${id}`)
     return res.data.data.data
   },
 
   create: async (data: CreatePurchaseOrderInput): Promise<PurchaseOrder> => {
-    const res = await axiosInstance.post("/purchase-orders", data)
+    const res = await axiosInstance.post("/purchase", data)
     return res.data.data.data
   },
 
@@ -379,12 +417,12 @@ export const purchaseApi = {
     id: string,
     data: UpdatePurchaseOrderInput
   ): Promise<PurchaseOrder> => {
-    const res = await axiosInstance.put(`/purchase-orders/${id}`, data)
+    const res = await axiosInstance.put(`/purchase/${id}`, data)
     return res.data.data.data
   },
 
   delete: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/purchase-orders/${id}`)
+    await axiosInstance.delete(`/purchase/${id}`)
   }
 }
 
@@ -397,18 +435,34 @@ export const purchaseApi = {
 
 export const orderApi = {
 
-  getAll: async (): Promise<Order[]> => {
-    const res = await axiosInstance.get("/orders")
+  // getAll: async (): Promise<Order[]> => {
+  //   const res = await axiosInstance.get("/order")
+  //   return res.data.data
+  // },
+
+  getAll: async (params?: GetParams): Promise<{
+    data: Order[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/order", {
+      params
+    })
+
     return res.data.data
   },
 
   getById: async (id: string): Promise<Order> => {
-    const res = await axiosInstance.get(`/orders/${id}`)
+    const res = await axiosInstance.get(`/order/${id}`)
     return res.data.data
   },
 
   create: async (data: CreateOrderInput): Promise<Order> => {
-    const res = await axiosInstance.post("/orders", data)
+    const res = await axiosInstance.post("/order", data)
     return res.data.data
   },
 
@@ -416,12 +470,12 @@ export const orderApi = {
     id: string,
     data: UpdateOrderStatusInput
   ): Promise<Order> => {
-    const res = await axiosInstance.put(`/orders/${id}`, data)
+    const res = await axiosInstance.put(`/order/${id}`, data)
     return res.data.data
   },
 
   delete: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/orders/${id}`)
+    await axiosInstance.delete(`/order/${id}`)
   }
 }
 
@@ -434,18 +488,33 @@ export const orderApi = {
 
 export const saleApi = {
 
-  getAll: async (): Promise<Sale[]> => {
-    const res = await axiosInstance.get("/sales")
+  // getAll: async (): Promise<Sale[]> => {
+  //   const res = await axiosInstance.get("/sale")
+  //   return res.data.data
+  // },
+    getAll: async (params?: GetParams): Promise<{
+    data: Sale[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/sale", {
+      params
+    })
+
     return res.data.data
   },
 
   getById: async (id: string): Promise<Sale> => {
-    const res = await axiosInstance.get(`/sales/${id}`)
+    const res = await axiosInstance.get(`/sale/${id}`)
     return res.data.data
   },
 
   create: async (data: CreateSaleInput): Promise<Sale> => {
-    const res = await axiosInstance.post("/sales", data)
+    const res = await axiosInstance.post("/sale", data)
     return res.data.data
   },
 
@@ -465,27 +534,90 @@ export const saleApi = {
 
 export const refundApi = {
 
-  getAll: async (): Promise<Refund[]> => {
-    const res = await axiosInstance.get("/refunds")
+  // getAll: async (): Promise<Refund[]> => {
+  //   const res = await axiosInstance.get("/refund")
+  //   return res.data.data
+  // },
+  getAll: async (params?: GetParams): Promise<{
+    data: Refund[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/refund", {
+      params
+    })
+
     return res.data.data
   },
 
+
   getById: async (id: string): Promise<Refund> => {
-    const res = await axiosInstance.get(`/refunds/${id}`)
+    const res = await axiosInstance.get(`/refund/${id}`)
     return res.data.data
   },
 
   create: async (data: CreateRefundInput): Promise<Refund> => {
-    const res = await axiosInstance.post("/refunds", data)
+    const res = await axiosInstance.post("/refund", data)
     return res.data.data
   },
 
   delete: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/refunds/${id}`)
+    await axiosInstance.delete(`/refund/${id}`)
   }
 }
 
 
 
 // --------------------------------------------------------  Refund end -----------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------  Import start -----------------------------------------------------------------------
+
+
+export const importApi = {
+
+  // getAll: async (): Promise<Import[]> => {
+  //   const res = await axiosInstance.get("/import")
+  //   return res.data.data
+  // },
+
+    getAll: async (params?: GetParams): Promise<{
+    data: Import[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/import", {
+      params
+    })
+
+    return res.data.data
+  },
+
+  getById: async (id: string): Promise<Import> => {
+    const res = await axiosInstance.get(`/import/${id}`)
+    return res.data.data
+  },
+
+  create: async (data: CreateImportInput): Promise<Import> => {
+    const res = await axiosInstance.post("/import", data)
+    return res.data.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/import/${id}`)
+  }
+}
+
+
+
+// --------------------------------------------------------  Import end -----------------------------------------------------------------------
 

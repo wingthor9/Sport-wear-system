@@ -1,7 +1,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
-import {  UpdateCustomerInput } from "./customer.type"
+import {  CreateCustomerInput, UpdateCustomerInput } from "./customer.type"
 import { BadRequestError, NotFoundError } from "@/utils/response"
 
 export const customerService = {
@@ -33,7 +33,12 @@ export const customerService = {
 
     },
 
-
+    async createCustomer(data: CreateCustomerInput) {
+        const customer = await prisma.customer.create({
+            data
+        })
+        return customer
+    },
 
 
     async updateCustomer(id: string, data: UpdateCustomerInput) {

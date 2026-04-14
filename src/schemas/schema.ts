@@ -1,5 +1,4 @@
 import { z } from "zod"
-import CustomerForm from '../app/features/customer/customer-form';
 
 /* ----------------------------- Start Product Schema ----------------------------- */
 export const productSchema = z.object({
@@ -29,7 +28,6 @@ export type CategoryUpdateInput = z.infer<typeof categoryUpdateSchema>
 
 
 // Customer Schema
-
 export const customerAddSchema = z.object({
   customer_name: z.string().min(1, "Customer name is required"),
   phone: z.string().min(5, "Phone number is required"),
@@ -67,17 +65,17 @@ export type SupplierUpdateInput = z.infer<typeof supplierUpdateSchema>
 
 // Purchase Schema
 export const purchaseDetailSchema = z.object({
-  product_id: z.number(),
+  product_id: z.string(),
   quantity: z.number().min(1),
   price: z.number().min(0)
 })
 export const purchaseSchema = z.object({
-  supplier_id: z.number(),
-  employee_id: z.number(),
+  supplier_id: z.string(),
+  employee_id: z.string(),
   purchase_date: z.date().optional(),
-  items: z.array(purchaseDetailSchema)
+  purchase_details: z.array(purchaseDetailSchema)
 })
-export type PurchaseInput = z.infer<typeof purchaseSchema>
+export type PurchaseFormValues = z.infer<typeof purchaseSchema>
 
 
 
@@ -92,9 +90,9 @@ export const importSchema = z.object({
   purchase_id: z.number(),
   employee_id: z.number(),
   import_date: z.date().optional(),
-  items: z.array(importDetailSchema)
+  purchase_details: z.array(importDetailSchema)
 })
-export type ImportInput = z.infer<typeof importSchema>
+export type ImportFormValue = z.infer<typeof importSchema>
 
 
 
@@ -140,16 +138,24 @@ export const customerLoginAuthSchema = z.object({
 export type CustomerLoginInput = z.infer<typeof customerLoginAuthSchema>
 
 // auth customer register schema
-export const customerRegisterSchema = z.object({
+export const customerCreateSchema = z.object({
   customer_name: z.string(),
   phone: z.string(),
   password: z.string(),
   email: z.string().email(),
   gender: z.string().optional(),
   address: z.string().optional(),
-  isActive: z.boolean().optional()
 })
-export type CustomerFormValues = z.infer<typeof customerRegisterSchema>
+export type CustomerCreateFormValues = z.infer<typeof customerCreateSchema>
+
+export const customerUpdateSchema = z.object({
+  customer_name: z.string(),
+  phone: z.string(),
+  email: z.string(),
+  gender: z.string().optional(),
+  address: z.string().optional(),
+})
+export type CustomerUpdateFormValues = z.infer<typeof customerUpdateSchema>
 
 
 // auth admin login schema

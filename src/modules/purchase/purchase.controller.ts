@@ -42,7 +42,7 @@ export const purchaseController = {
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
             }
-return errorResponse("Internal Server Error", 500)
+            return errorResponse("Internal Server Error", 500)
         }
     },
 
@@ -55,7 +55,7 @@ return errorResponse("Internal Server Error", 500)
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
             }
-return errorResponse("Internal Server Error", 500)
+            return errorResponse("Internal Server Error", 500)
         }
     },
 
@@ -77,7 +77,7 @@ return errorResponse("Internal Server Error", 500)
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
             }
-return errorResponse("Internal Server Error", 500)
+            return errorResponse("Internal Server Error", 500)
         }
     },
 
@@ -90,7 +90,7 @@ return errorResponse("Internal Server Error", 500)
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
             }
-return errorResponse("Internal Server Error", 500)
+            return errorResponse("Internal Server Error", 500)
         }
     }
 }

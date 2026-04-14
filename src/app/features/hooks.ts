@@ -1,6 +1,7 @@
+
 "use client"
 
-import { adminApi, adminAuthApi, categoryApi, customerApi,  orderApi, productApi, purchaseApi, refundApi, saleApi, supplierApi } from "./api"
+import { adminApi, adminAuthApi, categoryApi, customerApi, importApi, orderApi, productApi, purchaseApi, refundApi, saleApi, supplierApi } from "./api"
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import { CreateCustomerInput, UpdateCustomerInput } from "@/modules/customer/customer.type"
 import { CreateEmployeeInput, UpdateEmployeeInput } from "@/modules/employee/employee.type"
@@ -10,7 +11,8 @@ import { CreatePurchaseOrderInput, UpdatePurchaseOrderInput } from "@/modules/pu
 import { CreateOrderInput, UpdateOrderStatusInput } from "@/modules/order/order.types"
 import { CreateSaleInput } from "@/modules/sale/sale.type"
 import { CreateRefundInput } from "@/modules/refund/refund.type"
-import { CustomerRegisterInput, ForgotPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
+import { ForgotPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
+import { CreateImportInput } from '@/modules/import/import.type';
 
 
 export type UseGetParams = {
@@ -306,7 +308,7 @@ export const useGetCustomer = (id: string) => {
 export const useCreateCustomer = () => {
     const qc = useQueryClient()
     return useMutation({
-        mutationFn: (data: CustomerRegisterInput) =>
+        mutationFn: (data: CreateCustomerInput) =>
             customerApi.create(data),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["customers"] })
@@ -426,10 +428,18 @@ export const useAdminUpdateStatus = () => {
 // -------------------------------------------------------- Supplier start -----------------------------------------------------------------------
 
 
-export const useGetSuppliers = () => {
+// export const useGetSuppliers = () => {
+//     return useQuery({
+//         queryKey: ["suppliers"],
+//         queryFn: supplierApi.getAll
+//     })
+// }
+
+export const useGetSuppliers = (params?: UseGetParams) => {
     return useQuery({
-        queryKey: ["suppliers"],
-        queryFn: supplierApi.getAll
+        queryKey: ["suppliers", params],
+        queryFn: () => supplierApi.getAll(params),
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -483,16 +493,24 @@ export const useDeleteSupplier = () => {
 // --------------------------------------------------------  Purchase start -----------------------------------------------------------------------
 
 
-export const useGetPurchaseOrders = () => {
+// export const useGetPurchaseOrders = () => {
+//     return useQuery({
+//         queryKey: ["purchase-orders"],
+//         queryFn: purchaseApi.getAll
+//     })
+// }
+
+export const useGetPurchaseOrders = (params?: UseGetParams) => {
     return useQuery({
-        queryKey: ["purchase-orders"],
-        queryFn: purchaseApi.getAll
+        queryKey: ["purchase", params],
+        queryFn: () => purchaseApi.getAll(params),
+        placeholderData: keepPreviousData,
     })
 }
 
 export const useGetPurchaseOrder = (id: string) => {
     return useQuery({
-        queryKey: ["purchase-order", id],
+        queryKey: ["purchase", id],
         queryFn: () => purchaseApi.getById(id),
         enabled: !!id
     })
@@ -506,7 +524,7 @@ export const useCreatePurchaseOrder = () => {
             purchaseApi.create(data),
 
         onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["purchase-orders"] })
+            qc.invalidateQueries({ queryKey: ["purchase"] })
         }
     })
 }
@@ -524,7 +542,7 @@ export const useUpdatePurchaseOrder = () => {
         }) => purchaseApi.update(id, data),
 
         onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["purchase-orders"] })
+            qc.invalidateQueries({ queryKey: ["purchase"] })
         }
     })
 }
@@ -536,7 +554,7 @@ export const useDeletePurchaseOrder = () => {
         mutationFn: (id: string) => purchaseApi.delete(id),
 
         onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["purchase-orders"] })
+            qc.invalidateQueries({ queryKey: ["purchase"] })
         }
     })
 }
@@ -548,10 +566,17 @@ export const useDeletePurchaseOrder = () => {
 
 // --------------------------------------------------------  Order start -----------------------------------------------------------------------
 
-export const useGetOrders = () => {
+// export const useGetOrders = () => {
+//     return useQuery({
+//         queryKey: ["orders"],
+//         queryFn: orderApi.getAll
+//     })
+// }
+export const useGetOrders = (params?: UseGetParams) => {
     return useQuery({
-        queryKey: ["orders"],
-        queryFn: orderApi.getAll
+        queryKey: ["orders", params],
+        queryFn: () => orderApi.getAll(params),
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -615,13 +640,21 @@ export const useDeleteOrder = () => {
 // --------------------------------------------------------  sale or POS start -----------------------------------------------------------------------
 
 
-export const useGetSales = () => {
+// export const useGetSales = () => {
+//     return useQuery({
+//         queryKey: ["sales"],
+//         queryFn: saleApi.getAll
+//     })
+// }
+
+
+export const useGetSales = (params?: UseGetParams) => {
     return useQuery({
-        queryKey: ["sales"],
-        queryFn: saleApi.getAll
+        queryKey: ["sales", params],
+        queryFn: () => saleApi.getAll(params),
+        placeholderData: keepPreviousData,
     })
 }
-
 export const useGetSale = (id: string) => {
     return useQuery({
         queryKey: ["sale", id],
@@ -665,10 +698,18 @@ export const useCreateSale = () => {
 // --------------------------------------------------------  Refund start -----------------------------------------------------------------------
 
 
-export const useGetRefunds = () => {
+// export const useGetRefunds = () => {
+//     return useQuery({
+//         queryKey: ["refunds"],
+//         queryFn: refundApi.getAll
+//     })
+// }
+
+export const useGetRefunds = (params?: UseGetParams) => {
     return useQuery({
-        queryKey: ["refunds"],
-        queryFn: refundApi.getAll
+        queryKey: ["refunds", params],
+        queryFn: () => refundApi.getAll(params),
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -710,5 +751,52 @@ export const useDeleteRefund = () => {
 
 
 // --------------------------------------------------------  Refund end -----------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------  Import start -----------------------------------------------------------------------
+
+
+
+export const useGetImports = (params?: UseGetParams) => {
+    return useQuery({
+        queryKey: ["imports", params],
+        queryFn: () => importApi.getAll(params),
+        placeholderData: keepPreviousData,
+    })
+}
+
+export const useCreateImport = () => {
+    const qc = useQueryClient()
+
+    return useMutation({
+        mutationFn: (data: CreateImportInput) =>
+            importApi.create(data),
+
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["imports"] })
+            qc.invalidateQueries({ queryKey: ["products"] })
+        }
+    })
+}
+
+
+export const useDeleteImport = () => {
+    const qc = useQueryClient()
+
+    return useMutation({
+        mutationFn: (id: string) => importApi.delete(id),
+
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["imports"] })
+        }
+    })
+}
+
+
+
+
+
+// --------------------------------------------------------  Import end -----------------------------------------------------------------------
 
 

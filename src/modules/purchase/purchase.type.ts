@@ -9,10 +9,8 @@ export type PurchaseDetail = {
   quantity: number
   price: number
   received_qty: number
-
   product_id: string
   purchase_id: string
-
   product?: Product
 }
 
@@ -43,11 +41,14 @@ export type CreatePurchaseDetailInput = {
 export type CreatePurchaseOrderInput = {
   supplier_id: string
   employee_id: string
+  purchase_date: Date
   purchase_details: CreatePurchaseDetailInput[]
 }
+
 
 export type UpdatePurchaseOrderInput = {
   supplier_id?: string
   employee_id?: string
+  purchase_date?: Date
   purchase_details?: CreatePurchaseDetailInput[]
 }

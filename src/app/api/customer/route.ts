@@ -1,4 +1,3 @@
-import { authController } from "@/modules/auth/auth.controller"
 import { customerController } from "@/modules/customer/customer.controller"
 import { NextRequest } from "next/server"
 
@@ -7,5 +6,5 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    return authController.customerRegister(req)
+    return customerController.createCustomer(req)
 }
