@@ -44,7 +44,7 @@ export const importService = {
         return record
     },
 
-    async createImport(data: CreateImportInput, userId: string) {
+    async createImport(data: CreateImportInput, employeeId: string) {
         console.log("data for import",data)
         return prisma.$transaction(async (tx) => {
 
@@ -91,7 +91,7 @@ export const importService = {
             const newImport = await tx.import.create({
                 data: {
                     purchase_id: data.purchase_id,
-                    employee_id: userId,
+                    employee_id: employeeId,
                     import_details: {
                         create: data.import_details
                     }

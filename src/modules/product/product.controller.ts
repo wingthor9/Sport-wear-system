@@ -10,9 +10,7 @@ import { formDataParser } from "@/utils/cloudinary"
 import { CreateProductInput } from "./product.types"
 
 export const productController = {
-
     async getProducts(req: NextRequest) {
-
         try {
             const { page, limit, skip } = getPaginationParams(req)
             const search = getSearchParam(req)
@@ -66,7 +64,7 @@ export const productController = {
             const body: CreateProductInput = {
                 product_name: fd.get("product_name") as string,
                 description: fd.get("description") as string,
-                price: Number(fd.get("price")),
+                sale_price: Number(fd.get("price")),
                 stock_qty: Number(fd.get("stock_qty")),
                 category_id: fd.get("category_id") as string,
                 files: fd.getAll("images") as File[],
@@ -94,7 +92,7 @@ export const productController = {
             const formData = await req.formData();
             const product = await productService.updateProduct(id, {
                 product_name: formDataParser.string(formData, "name"),
-                price: formDataParser.number(formData, "price"),
+                sale_price: formDataParser.number(formData, "price"),
                 stock_qty: formDataParser.number(formData, "stock"),
                 description: formDataParser.string(formData, "description"),
                 category_id: formDataParser.string(formData, "categoryId"),

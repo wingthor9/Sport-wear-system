@@ -13,6 +13,7 @@ import { CreateRefundInput, Refund } from "@/modules/refund/refund.type"
 import { ForgotPasswordInput, ResetPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
 import { isAxiosError } from "axios"
 import { CreateImportInput, Import } from "@/modules/import/import.type"
+import { CreatePaymentInput, Payment, VerifyPaymentInput } from "@/modules/payment/payment.type"
 
 
 export type GetParams = {
@@ -492,7 +493,7 @@ export const saleApi = {
   //   const res = await axiosInstance.get("/sale")
   //   return res.data.data
   // },
-    getAll: async (params?: GetParams): Promise<{
+  getAll: async (params?: GetParams): Promise<{
     data: Sale[]
     meta: {
       total: number
@@ -586,7 +587,7 @@ export const importApi = {
   //   return res.data.data
   // },
 
-    getAll: async (params?: GetParams): Promise<{
+  getAll: async (params?: GetParams): Promise<{
     data: Import[]
     meta: {
       total: number
@@ -620,4 +621,68 @@ export const importApi = {
 
 
 // --------------------------------------------------------  Import end -----------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------  Payment end -----------------------------------------------------------------------
+
+
+export const paymentApi = {
+
+  // getAll: async (): Promise<Export[]> => {
+  //   const res = await axiosInstance.get("/export")
+  //   return res.data.data
+  // },
+
+  getAll: async (params?: GetParams): Promise<{
+    data: Payment[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/payment", {
+      params
+    })
+
+    return res.data.data
+  },
+
+  getById: async (id: string): Promise<Payment> => {
+    const res = await axiosInstance.get(`/payment/${id}`)
+    return res.data.data
+  },
+
+  // create: async (data: CreatePaymentInput): Promise<Payment> => {
+  //   const res = await axiosInstance.post("/payment", FormData)
+  //   return res.data.data
+  // },
+  create: async (data: FormData): Promise<Payment> => {
+    const res = await axiosInstance.post("/payment", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    return res.data.data.data
+  },
+
+  verifyPayment: async (id: string, data: VerifyPaymentInput): Promise<Payment> => {
+    const res = await axiosInstance.patch(`/payment/${id}`, data)
+    return res.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/payment/${id}`)
+  }
+
+
+
+
+}
+
+
+
+// --------------------------------------------------------  Payment end -----------------------------------------------------------------------
 

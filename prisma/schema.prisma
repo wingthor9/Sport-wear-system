@@ -96,8 +96,10 @@ model Category {
 
 model Product {
   product_id    String      @id @default(uuid())
+  product_code  String      @unique
   product_name  String
-  price         Float
+  purchase_price  Int?
+  sale_price    Int
   stock_qty     Int
   description   String?
   createdAt DateTime @default(now())
@@ -183,7 +185,7 @@ model Supplier {
 model PurchaseOrder {
   purchase_id   String      @id @default(uuid())
   purchase_date DateTime @default(now())
-  total_amount  Float?
+  total_amount  Int?
   status        String   @default("pending")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -207,7 +209,7 @@ model PurchaseOrder {
 model PurchaseDetail {
   purchase_detail_id String @id @default(uuid())
   quantity           Int
-  price              Float
+  price              Int
   received_qty       Int    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -225,6 +227,7 @@ model PurchaseDetail {
 
 model Import {
   import_id   String      @id @default(uuid())
+  import_code String      @unique
   import_date DateTime @default(now())
   purchase_id String
   employee_id String
@@ -240,7 +243,7 @@ model Import {
 model ImportDetail {
   import_detail_id String @id @default(uuid())
   quantity         Int
-  cost_price       Float
+  cost_price       Int
   import_id String
   product_id String
   createdAt DateTime @default(now())
@@ -255,9 +258,10 @@ model ImportDetail {
 
 model Order {
   order_id     String      @id @default(uuid())
+  order_code   String      @unique
   order_date   DateTime @default(now())
   status OrderStatus @default(WAITING_PAYMENT)
-  total_amount Float?
+  total_amount Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -274,7 +278,6 @@ model Order {
 
 
 enum OrderStatus {
-  PENDING
   WAITING_PAYMENT
   PAID
   SHIPPED
@@ -286,7 +289,7 @@ enum OrderStatus {
 model OrderDetail {
   order_detail_id String @id @default(uuid())
   quantity        Int
-  price           Float
+  price           Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -300,7 +303,7 @@ model OrderDetail {
 model Sale {
   sale_id      String      @id @default(uuid())
   sale_date    DateTime @default(now())
-  total_amount Float?
+  total_amount Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -317,7 +320,7 @@ model Sale {
 model SaleDetail {
   sale_detail_id String @id @default(uuid())
   quantity       Int
-  price          Float
+  price          Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -331,8 +334,9 @@ model SaleDetail {
 
 model Refund {
   refund_id    String   @id @default(uuid())
+  refund_code  String   @unique
   sale_id      String
-  total_amount Float
+  total_amount Int
   createdAt    DateTime @default(now())
 
   sale         Sale     @relation(fields: [sale_id], references: [sale_id])
@@ -343,7 +347,7 @@ model RefundDetail {
   refund_detail_id String @id @default(uuid())
   product_id       String
   quantity         Int
-  price            Float
+  price            Int
 
   refund_id String
   refund    Refund @relation(fields: [refund_id], references: [refund_id], onDelete: Cascade)
@@ -352,8 +356,7 @@ model RefundDetail {
 model Payment {
   payment_id   String      @id @default(uuid())
   payment_date DateTime    @default(now())
-  amount       Float
-  method       String?     // QR / BANK
+  amount       Int
   status       PaymentStatus @default(PENDING)
 
   slip_url     String?     // รูปสลิป (Cloudinary)
@@ -361,6 +364,9 @@ model Payment {
 
   verified_by  String?     // employee_id
   verified_at  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
 
   order_id String @unique
 

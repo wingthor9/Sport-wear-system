@@ -65,8 +65,8 @@ export const importController = {
         try {
             const body: CreateImportInput = await req.json()
             const payload = getUserFromToken(req)
-            const userId = (await payload).id
-            const record = await importService.createImport(body, userId)
+            const employeeId = (await payload).id
+            const record = await importService.createImport(body, employeeId)
             return successResponse(record, "Create import successfully", 201)
         } catch (error) {
             console.log(error)

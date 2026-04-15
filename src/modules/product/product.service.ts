@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client"
 import { uploadMultipleImages, convertFileToBase64, deleteImages } from "@/utils/cloudinary";
 import { CreateProductInput, ProductImageInput, UpdateProductInput } from "./product.types";
 import { BadRequestError, NotFoundError } from "@/utils/response";
+import { generateProductCode } from "@/utils/generateCode";
 
 export const productService = {
 
@@ -47,11 +48,13 @@ export const productService = {
       }));
     }
 
+    const code = generateProductCode()
     const product = await prisma.product.create({
       data: {
         product_name: data.product_name,
+        product_code: code,
         description: data.description,
-        price: data.price,
+        sale_price: data.sale_price,
         stock_qty: data.stock_qty,
         category_id: data.category_id,
         images: {
@@ -114,7 +117,7 @@ export const productService = {
       where: { product_id: productId },
       data: {
         product_name: data.product_name,
-        price: data.price,
+        sale_price: data.sale_price,
         stock_qty: data.stock_qty,
         description: data.description,
         category_id: data.category_id,

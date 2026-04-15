@@ -1,16 +1,8 @@
-// export interface CreateOrderDetailInput {
-//   product_id: string
-//   quantity: number
-//   price: number
-// }
 
 import { Customer } from "../customer/customer.type"
 import { Product } from "../product/product.types"
 
-// export interface CreateOrderInput {
-//   customer_id: string
-//   order_details: CreateOrderDetailInput[]
-// }
+
 
 export type OrderStatus =
   | "PENDING"

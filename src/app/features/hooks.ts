@@ -1,7 +1,7 @@
 
 "use client"
 
-import { adminApi, adminAuthApi, categoryApi, customerApi, importApi, orderApi, productApi, purchaseApi, refundApi, saleApi, supplierApi } from "./api"
+import { adminApi, adminAuthApi, categoryApi, customerApi, importApi, orderApi, paymentApi, productApi, purchaseApi, refundApi, saleApi, supplierApi } from "./api"
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import { CreateCustomerInput, UpdateCustomerInput } from "@/modules/customer/customer.type"
 import { CreateEmployeeInput, UpdateEmployeeInput } from "@/modules/employee/employee.type"
@@ -13,6 +13,7 @@ import { CreateSaleInput } from "@/modules/sale/sale.type"
 import { CreateRefundInput } from "@/modules/refund/refund.type"
 import { ForgotPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
 import { CreateImportInput } from '@/modules/import/import.type';
+import { CreatePaymentInput, VerifyPaymentInput } from '@/modules/payment/payment.type';
 
 
 export type UseGetParams = {
@@ -797,5 +798,64 @@ export const useDeleteImport = () => {
 
 
 // --------------------------------------------------------  Import end -----------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------  Import end -----------------------------------------------------------------------
+
+
+export const useGetPayment = (params?: UseGetParams) => {
+    return useQuery({
+        queryKey: ["payments", params],
+        queryFn: () => paymentApi.getAll(params),
+        placeholderData: keepPreviousData,
+    })
+}
+
+
+export const useGetPaymentById = (id: string) => {
+    return useQuery({
+        queryKey: ["payment", id],
+        queryFn: () => paymentApi.getById(id),
+        enabled: !!id
+    })
+}
+
+
+export const useCreatePayment = () => {
+    const qc = useQueryClient()
+    return useMutation({
+        mutationFn: paymentApi.create,
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["payments"] })
+        }
+    })
+}
+
+
+
+export const useVerifyPayment = () => {
+    const qc = useQueryClient()
+
+    return useMutation({
+        mutationFn: ({
+            id,
+            data
+        }: {
+            id: string
+            data: VerifyPaymentInput
+        }) =>
+            paymentApi.verifyPayment(id, data),
+
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["payments"] })
+        }
+    })
+}
+
+
+
+
+// --------------------------------------------------------  Payment end -----------------------------------------------------------------------
 
 

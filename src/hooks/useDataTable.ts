@@ -2,7 +2,7 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
 type Order = "asc" | "desc"
 
@@ -55,6 +55,15 @@ export function useDataTable() {
     return { page, limit, search, sort, order }
   }, [page, limit, search, sort, order])
 
+
+  const [filters, setFilters] = useState<Record<string, string>>({})
+  const setFilter = (key: string, value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value
+    }))
+  }
+
   return {
     page,
     limit,
@@ -66,6 +75,9 @@ export function useDataTable() {
     setSearch,
     setSort,
     setOrder,
-    params
+    filters,
+    setFilter,
+    params,
+    ...filters
   }
 }

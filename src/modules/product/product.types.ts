@@ -2,7 +2,8 @@
 
 export type CreateProductInput = {
   product_name: string;
-  price: number;
+  product_code?: string;
+  sale_price: number;
   stock_qty: number;
   category_id: string;
   description?: string;
@@ -27,8 +28,9 @@ export type ProductImage = {
 
 export type Product = {
   product_id: string
+  product_code?: string
   product_name: string
-  price: string
+  sale_price: string
   stock_qty: string
   description?: string
   category_id: string

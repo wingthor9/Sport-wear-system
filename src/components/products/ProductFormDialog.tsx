@@ -35,7 +35,7 @@ export function ProductFormDialog({ open, onOpenChange, product, create, update,
     resolver: zodResolver(productSchema),
     defaultValues: {
       product_name: "",
-      price: "",
+      sale_price: "",
       stock_qty: "",
       category_id: "",
       description: ""
@@ -49,7 +49,7 @@ export function ProductFormDialog({ open, onOpenChange, product, create, update,
     if (product) {
       reset({
         product_name: product.product_name,
-        price: String(product.price),
+        sale_price: String(product.sale_price),
         stock_qty: String(product.stock_qty),
         category_id: product.category_id,
         description: product.description || ""
@@ -62,7 +62,7 @@ export function ProductFormDialog({ open, onOpenChange, product, create, update,
   const toFormData = (values: ProductFormValues) => {
     const fd = new FormData()
     fd.append("product_name", values.product_name)
-    fd.append("price", values.price)
+    fd.append("sale_price", values.sale_price)
     fd.append("stock_qty", values.stock_qty)
     fd.append("category_id", values.category_id)
 
@@ -132,10 +132,10 @@ export function ProductFormDialog({ open, onOpenChange, product, create, update,
           <div>
             <Input
               type="number"
-              {...register("price")}
+              {...register("sale_price")}
               placeholder="Price"
             />
-            <div className="h-6 text-red-500">{errors.price?.message}</div>
+            <div className="h-6 text-red-500">{errors.sale_price?.message}</div>
           </div>
 
           <div>
