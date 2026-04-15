@@ -89,6 +89,7 @@ export function ProductFormDialog({ open, onOpenChange, product, create, update,
         })
         toast.success("Product updated")
       } else {
+        console.log("create product : ",fd)
         await create.mutateAsync(fd)
         toast.success("Product created")
       }
