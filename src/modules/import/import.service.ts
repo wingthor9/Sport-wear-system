@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 import { CreateImportInput } from "./import.type"
 import { BadRequestError, NotFoundError } from "@/utils/response"
+import { generateImportCode } from "@/utils/generateCode"
 
 export const importService = {
 
@@ -45,9 +46,7 @@ export const importService = {
     },
 
     async createImport(data: CreateImportInput, employeeId: string) {
-        console.log("data for import",data)
         return prisma.$transaction(async (tx) => {
-
             // 🔍 1. หา purchase
             const purchase = await tx.purchaseOrder.findUnique({
                 where: { purchase_id: data.purchase_id },
@@ -88,10 +87,12 @@ export const importService = {
             }
 
             // 🧾 3. create import
+            const code = generateImportCode()
             const newImport = await tx.import.create({
                 data: {
                     purchase_id: data.purchase_id,
                     employee_id: employeeId,
+                    import_code: code,
                     import_details: {
                         create: data.import_details
                     }

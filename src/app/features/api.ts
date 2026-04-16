@@ -207,9 +207,24 @@ export const productApi = {
 // -------------------------------------------------------- Category start -----------------------------------------------------------------------
 
 export const categoryApi = {
-  getAll: async (): Promise<Category[]> => {
-    const res = await axiosInstance.get("/category")
-    return res.data.data.data
+  //   getAll: async (): Promise<Category[]> => {
+  //     const res = await axiosInstance.get("/category")
+  //     return res.data.data.data
+  //   },
+
+  getAll: async (params?: GetParams): Promise<{
+    data: Category[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/category", {
+      params
+    })
+    return res.data.data
   },
 
   getOne: async (id: string): Promise<Category> => {

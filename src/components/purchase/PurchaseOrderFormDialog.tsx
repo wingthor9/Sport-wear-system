@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,7 +12,10 @@ import { Product } from "@/modules/product/product.types"
 import { UseMutationResult } from "@tanstack/react-query"
 import { PurchaseFormValues, purchaseSchema } from "@/schemas/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useAuth } from "@/app/features/hooks"
+import { useAuth, useCreateProduct, useUpdateProduct } from "@/app/features/hooks"
+import { ProductCombobox } from "./ProductCombobox"
+import { ProductFormDialog } from "../products/ProductFormDialog"
+import { Category } from "@/modules/category/category.type"
 
 type Props = {
     open: boolean
@@ -22,19 +25,19 @@ type Props = {
     update: UseMutationResult<PurchaseOrder, Error, { id: string; data: UpdatePurchaseOrderInput }>
     suppliers: Supplier[]
     products: Product[]
+    categories: Category[]
 }
 
-// type FormValues = {
-//     supplier_id: string
-//     purchase_details: {
-//         product_id: string
-//         quantity: number
-//         price: number
-//     }[]
-// }
 
-export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, create, update, suppliers, products }: Props) {
+export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, create, update, suppliers, products, categories }: Props) {
     const { user, isLoading } = useAuth()
+    const [openProductDialog, setOpenProductDialog] = useState(false)
+    const [tempIndex, setTempIndex] = useState<number | null>(null)
+    const createProduct = useCreateProduct()
+    const updateProduct = useUpdateProduct()
+
+
+
     const { register, control, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<PurchaseFormValues>({
         resolver: zodResolver(purchaseSchema),
         defaultValues: {
@@ -110,7 +113,6 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
         }
     }
 
-    // console.log("user : ",user )
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -142,7 +144,7 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
 
                                 {/* PRODUCT */}
                                 <div>
-                                    <select
+                                    {/* <select
                                         {...register(`purchase_details.${index}.product_id` as const)}
                                         className="border p-2"
                                     >
@@ -152,7 +154,19 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
                                                 {p.product_name}
                                             </option>
                                         ))}
-                                    </select>
+                                    </select> */}
+
+                                    <ProductCombobox
+                                        products={products}
+                                        value={watch(`purchase_details.${index}.product_id`)}
+                                        onChange={(val) =>
+                                            setValue(`purchase_details.${index}.product_id`, val)
+                                        }
+                                        onCreateNew={() => {
+                                            setTempIndex(index)
+                                            setOpenProductDialog(true)
+                                        }}
+                                    />
                                     <div className="h-6 text-red-500">{errors.purchase_details?.[index]?.product_id?.message}</div>
                                 </div>
 
@@ -207,6 +221,13 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
                 </form>
 
             </DialogContent>
+            <ProductFormDialog
+                open={openProductDialog}
+                onOpenChange={setOpenProductDialog}
+                categories={categories as Category[]}
+                create={createProduct}
+                update={updateProduct}
+            />
         </Dialog>
     )
 }

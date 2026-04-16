@@ -137,7 +137,7 @@ export const purchaseService = {
     },
 
     async deletePurchase(id: string) {
-        const result = await prisma.$transaction(async (tx) => {
+         await prisma.$transaction(async (tx) => {
 
             // 🔍 1. หา purchase
             const existing = await tx.purchaseOrder.findUnique({
@@ -165,9 +165,6 @@ export const purchaseService = {
             await tx.purchaseOrder.delete({
                 where: { purchase_id: id }
             })
-            if (!result) {
-                throw new BadRequestError("Failed to delete purchase")
-            }
             return { message: "Purchase deleted successfully" }
         })
     }

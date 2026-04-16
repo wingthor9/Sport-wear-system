@@ -47,6 +47,7 @@ export function ImportFormDialog({ open, onOpenChange, create, purchases }: Prop
         const items =
             purchase.purchase_details?.map(d => ({
                 product_id: d.product_id,
+                product_name: d.product?.product_name,
                 quantity: d.quantity,
                 cost_price: d.price
 
@@ -71,9 +72,15 @@ export function ImportFormDialog({ open, onOpenChange, create, purchases }: Prop
                 return
             }
 
+            // await create.mutateAsync({
+            //     purchase_id: data.purchase_id,
+            //     import_details: data.import_details
+            // })
+
+            const cleanDetails = data.import_details.map(({ product_name, ...rest }) => rest)
             await create.mutateAsync({
                 purchase_id: data.purchase_id,
-                import_details: data.import_details
+                import_details: cleanDetails
             })
 
             toast.success("Import created")
@@ -87,9 +94,7 @@ export function ImportFormDialog({ open, onOpenChange, create, purchases }: Prop
     }
 
     /* 🔥 only pending purchase */
-    const pendingPurchases = purchases.filter(
-        p => p.status === "pending"
-    )
+    const pendingPurchases = purchases.filter(p => p.status === "pending")
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange} >
@@ -138,12 +143,16 @@ export function ImportFormDialog({ open, onOpenChange, create, purchases }: Prop
                                 className="flex gap-2"
                             >
                                 {/* PRODUCT */}
+                                {/* 👁️ แสดงชื่อ */}
                                 <Input
-                                    value={f.product_id}
+                                    value={f.product_name || ""}
                                     disabled
-                                    {...register(
-                                        `import_details.${i}.product_id`
-                                    )}
+                                />
+
+                                {/* 📦 เก็บ id ไว้ submit */}
+                                <input
+                                    type="hidden"
+                                    {...register(`import_details.${i}.product_id`)}
                                 />
 
                                 {/* QTY */}

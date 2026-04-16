@@ -255,7 +255,8 @@ import {
     useUpdatePurchaseOrder,
     useDeletePurchaseOrder,
     useGetProducts,
-    useGetSuppliers
+    useGetSuppliers,
+    useGetCategories
 } from "@/app/features/hooks"
 
 import { AppPagination } from "@/components/AppPagination"
@@ -278,6 +279,8 @@ export default function PurchaseOrderPage() {
     const product = products?.data
     const { data: suppliers } = useGetSuppliers()
     const supplier = suppliers?.data
+    const { data: categories } = useGetCategories()
+    const category = categories?.data
 
     const [openForm, setOpenForm] = useState(false)
     const [selectedPurchase, setSelectedPurchase] = useState<PurchaseOrder | undefined>()
@@ -341,6 +344,7 @@ export default function PurchaseOrderPage() {
                 update={updatePurchase}
                 products={product ?? []}
                 suppliers={supplier ?? []}
+                categories={category ?? []}
             />
             <Dialog open={openDetail} onOpenChange={setOpenDetail}>
                 <DialogContent className="max-w-4xl">

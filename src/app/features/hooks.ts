@@ -238,10 +238,18 @@ export const useDeleteProduct = () => {
 
 // -------------------------------------------------------- Category start -----------------------------------------------------------------------
 
-export const useGetCategories = () => {
-    return useQuery<Category[]>({
-        queryKey: ["categories"],
-        queryFn: categoryApi.getAll,
+// export const useGetCategories = () => {
+//     return useQuery<Category[]>({
+//         queryKey: ["categories"],
+//         queryFn: categoryApi.getAll,
+//     })
+// }
+
+export const useGetCategories = (params?: UseGetParams) => {
+    return useQuery({
+        queryKey: ["categories", params],
+        queryFn: () => categoryApi.getAll(params),
+        placeholderData: keepPreviousData,
     })
 }
 

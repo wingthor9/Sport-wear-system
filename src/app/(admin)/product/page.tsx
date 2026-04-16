@@ -14,6 +14,7 @@ export default function ProductsPage() {
 
     const { data, isLoading } = useGetProducts(table.params)
     const { data: categories } = useGetCategories()
+    const category = categories?.data 
 
     const createProduct = useCreateProduct()
     const updateProduct = useUpdateProduct()
@@ -65,7 +66,7 @@ export default function ProductsPage() {
                 product={selectedProduct}
                 create={createProduct}
                 update={updateProduct}
-                categories={categories ?? []}
+                categories={category ?? []}
             />
 
         </div>

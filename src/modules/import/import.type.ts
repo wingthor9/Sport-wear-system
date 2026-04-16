@@ -16,6 +16,7 @@ export type ImportDetail = {
 
 export type Import = {
     import_id: string
+    import_code?: string
     import_date?: Date
     purchase_id: string
     employee_id?: string
@@ -28,12 +29,14 @@ export type Import = {
 
 export type CreateImportDetailInput = {
     product_id: string
+    product_code?: string
     quantity: number
     cost_price: number
 }
 
 export type CreateImportInput = {
     purchase_id: string
+    import_code?: string
     employee_id?: string
     import_date?: Date
     import_details: CreateImportDetailInput[]

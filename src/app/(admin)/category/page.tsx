@@ -15,6 +15,7 @@ import { Category } from "@/modules/category/category.type"
 
 export default function CategoriesPage() {
     const { data, isError, isPending } = useGetCategories()
+    const categories = data?.data
     const create = useCreateCategory()
     const update = useUpdateCategory()
     const del = useDeleteCategory()
@@ -23,7 +24,7 @@ export default function CategoriesPage() {
     const [formData, setFormData] = useState({ category_name: "", description: "", })
     if (isPending) return <div>Loading...</div>
     if (isError) return <div>Error</div>
-    // console.log("category : ", data)
+    console.log("category : ", data)
 
     // ✅ ADD
     const handleAdd = () => {
@@ -100,7 +101,7 @@ export default function CategoriesPage() {
 
             {/* GRID */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {data?.map((category: Category) => (
+                {categories?.map((category: Category) => (
                 <Card key={category?.category_id} className="p-6">
                     <div className="flex justify-between mb-4">
                         <FolderTree />
@@ -129,7 +130,7 @@ export default function CategoriesPage() {
                             {category.products?.length || 0}
                         </Badge>
 
-                        <span>{formatDate(category.createdAt)}</span>
+                        {/* <span>{formatDate(categories.createdAt)}</span> */}
                     </div>
                 </Card>
                  ))} 
@@ -139,7 +140,7 @@ export default function CategoriesPage() {
             <Card>
                 <table className="w-full">
                     <tbody>
-                        {data?.map((category: Category) => (
+                        {categories?.map((category: Category) => (
                         <tr key={category.category_id}>
                             <td>{category.category_name}</td>
                             <td>{category.description}</td>
@@ -150,7 +151,7 @@ export default function CategoriesPage() {
                                 </Badge>
                             </td>
 
-                            <td>{formatDate(category.createdAt)}</td>
+                            {/* <td>{formatDate(category.createdAt)}</td> */}
 
                             <td>
                                 <Button onClick={() => handleEdit(category)}>
