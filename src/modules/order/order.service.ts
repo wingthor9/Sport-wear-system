@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 import { CreateOrderInput } from "./order.types"
 import { BadRequestError, NotFoundError } from "@/utils/response"
+import { generateOrderCode } from "@/utils/generateCode"
 
 export const orderService = {
 
@@ -78,12 +79,14 @@ export const orderService = {
                 0
             )
 
+            const code = generateOrderCode()
             // 🧾 create order
             const order = await tx.order.create({
                 data: {
                     customer_id: data.customer_id,
+                    order_code: code ,
                     total_amount,
-                    status: "WAITING_PAYMENT", // ✅ สำคัญ
+                    status: "WAITING_PAYMENT",
                     order_details: {
                         create: data.order_details
                     }

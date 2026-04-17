@@ -2,8 +2,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Order, OrderStatus } from "@/modules/order/order.types"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
-import { MoreVertical } from "lucide-react"
+import { Eye, Trash2 } from "lucide-react"
+import { formatDate } from "@/utils/FormatDate"
+import { formatCurrency } from "@/utils/FormatCurrency"
 
 type Props = {
     orders: Order[]
@@ -54,11 +55,13 @@ export function OrderTable({ orders, isLoading, onView, onDelete, onUpdateStatus
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>ID</TableHead>
+                    <TableHead>NO:</TableHead>
+                    <TableHead>Order code</TableHead>
                     <TableHead>Customer</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Total</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Action</TableHead>
                     <TableHead />
                 </TableRow>
             </TableHeader>
@@ -73,26 +76,23 @@ export function OrderTable({ orders, isLoading, onView, onDelete, onUpdateStatus
                         <TableCell colSpan={6}>No data</TableCell>
                     </TableRow>
                 ) : (
-                    orders.map((o) => (
+                    orders.map((o,index) => (
                         <TableRow key={o.order_id}>
-                            <TableCell>{o.order_id}</TableCell>
-
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{o.order_code}</TableCell>
                             <TableCell>
                                 {o.customer?.customer_name}
                             </TableCell>
-
                             <TableCell>
-                                {new Date(o.order_date).toLocaleDateString()}
+                                {formatDate(o.order_date)}
                             </TableCell>
-
                             <TableCell>
-                                ${o.total_amount?.toLocaleString()}
+                                {formatCurrency(o.total_amount)}
                             </TableCell>
-
-                            {/* <TableCell>
+                            <TableCell>
                                 {getStatusBadge(o.status)}
-                            </TableCell> */}
-                            {/* 
+                            </TableCell>
+                            
                             <TableCell className="flex gap-2">
                                 <Button size="sm" variant="ghost" onClick={() => onView(o)}>
                                     <Eye className="w-4 h-4" />
@@ -105,51 +105,8 @@ export function OrderTable({ orders, isLoading, onView, onDelete, onUpdateStatus
                                 >
                                     <Trash2 className="w-4 h-4 text-red-500" />
                                 </Button>
-                            </TableCell> */}
-                            <TableCell>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button size="sm" variant="ghost">
-                                            <MoreVertical className="w-4 h-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-
-                                    <DropdownMenuContent>
-
-                                        {/* 👁 VIEW */}
-                                        <DropdownMenuItem
-                                            onClick={() => onView(o)}
-                                        >
-                                            View
-                                        </DropdownMenuItem>
-
-                                        {/* 🔄 UPDATE STATUS */}
-                                        {getStatusBadge(o.status) && (
-                                            <DropdownMenuItem
-                                                onClick={() => {
-                                                    const next = getStatusBadge(o.status)!
-                                                    if (!confirm(`Change status to ${next}?`)) return
-                                                    onUpdateStatus(o.order_id, next)
-                                                }}
-                                            >
-                                                Update → {getStatusBadge(o.status)}
-                                            </DropdownMenuItem>
-                                        )}
-
-                                        {/* 🗑 DELETE */}
-                                        <DropdownMenuItem
-                                            onClick={() => {
-                                                if (!confirm("Delete order?")) return
-                                                onDelete(o.order_id)
-                                            }}
-                                            className="text-red-500"
-                                        >
-                                            Delete
-                                        </DropdownMenuItem>
-
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
                             </TableCell>
+                            
                         </TableRow>
                     ))
                 )}

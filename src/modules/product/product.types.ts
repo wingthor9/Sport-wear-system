@@ -3,6 +3,7 @@
 export type CreateProductInput = {
   product_name: string;
   product_code?: string;
+  purchase_price?: number;
   sale_price: number;
   stock_qty: number;
   category_id: string;
@@ -28,10 +29,11 @@ export type ProductImage = {
 
 export type Product = {
   product_id: string
-  product_code?: string
+  product_code: string
   product_name: string
-  sale_price: string
-  stock_qty: string
+  purchase_price: number
+  sale_price: number
+  stock_qty: number
   description?: string
   category_id: string
   images: ProductImage[]

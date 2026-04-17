@@ -184,6 +184,7 @@ model Supplier {
 
 model PurchaseOrder {
   purchase_id   String      @id @default(uuid())
+  purchase_code String      @unique
   purchase_date DateTime @default(now())
   total_amount  Int?
   status        String   @default("pending")
@@ -357,6 +358,7 @@ model Payment {
   payment_id   String      @id @default(uuid())
   payment_date DateTime    @default(now())
   amount       Int
+  method       PaymentMethod @default(CASH)
   status       PaymentStatus @default(PENDING)
 
   slip_url     String?     // รูปสลิป (Cloudinary)
@@ -373,6 +375,12 @@ model Payment {
   order Order @relation(fields: [order_id], references: [order_id])
 }
 
+enum PaymentMethod {
+  CASH
+  TRANSFER
+}
+
+
 enum PaymentStatus {
   PENDING
   VERIFIED
@@ -387,8 +395,14 @@ model Delivery {
   updatedAt DateTime @updatedAt
 
   order_id String @unique
-
   order Order @relation(fields: [order_id], references: [order_id])
+}
+
+enum DeliveryStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
 model Point {
@@ -399,6 +413,5 @@ model Point {
   updatedAt DateTime @updatedAt
 
   customer_id String
-
   customer Customer @relation(fields: [customer_id], references: [customer_id], onDelete: Cascade)
 }

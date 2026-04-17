@@ -5,7 +5,6 @@ import { Prisma } from "@prisma/client"
 import { NextRequest } from "next/server"
 import { RefundService } from "./refund.service"
 import { prisma } from "@/lib/prisma"
-import { CreateRefundInput } from "./refund.type"
 import { BadRequestError, errorResponse, ForbiddenError, NotFoundError, successResponse, UnauthorizedError } from "@/utils/response"
 
 export const refundController = {
@@ -53,13 +52,13 @@ export const refundController = {
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
             }
-return errorResponse("Internal Server Error", 500)
+            return errorResponse("Internal Server Error", 500)
         }
     },
 
     async createRefund(req: NextRequest) {
         try {
-            const body: CreateRefundInput = await req.json()
+            const body = await req.json()
             const refund = await RefundService.createRefund(body)
             return successResponse(refund, "Create refund successfully", 201)
         } catch (error) {
@@ -67,7 +66,7 @@ return errorResponse("Internal Server Error", 500)
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
             }
-return errorResponse("Internal Server Error", 500)
+            return errorResponse("Internal Server Error", 500)
         }
     }
 

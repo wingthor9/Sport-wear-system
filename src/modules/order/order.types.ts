@@ -16,12 +16,9 @@ export type OrderDetail = {
   order_detail_id: string
   quantity: number
   price: number
-
   order_id: string
   product_id: string
-
   product?: Product
-
   createdAt: string
   updatedAt: string
 }
@@ -29,14 +26,12 @@ export type OrderDetail = {
 export type Order = {
   order_id: string
   order_date: string
+  order_code: string
   status: OrderStatus
-  total_amount?: number
-
+  total_amount: number
   customer_id: string
   customer?: Customer
-
   order_details?: OrderDetail[]
-
   createdAt: string
   updatedAt: string
 }

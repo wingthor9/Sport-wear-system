@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { CreateRefundInput } from "./refund.type"
 import { Prisma } from "@prisma/client"
 import { BadRequestError, NotFoundError } from "@/utils/response"
+import { generateRefundCode } from "@/utils/generateCode"
 
 export const RefundService = {
     async createRefund(data: CreateRefundInput) {
@@ -51,9 +52,11 @@ export const RefundService = {
             )
 
             // 🧾 6. create refund
+            const code = generateRefundCode()
             const refund = await tx.refund.create({
                 data: {
                     sale_id: data.sale_id,
+                    refund_code: code,
                     total_amount: total,
                     refund_details: {
                         create: data.refund_details

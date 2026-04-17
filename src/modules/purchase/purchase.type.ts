@@ -16,6 +16,7 @@ export type PurchaseDetail = {
 
 export type PurchaseOrder = {
   purchase_id: string
+  purchase_code: string
   purchase_date: string
   total_amount?: number
   status: string
@@ -40,8 +41,9 @@ export type CreatePurchaseDetailInput = {
 
 export type CreatePurchaseOrderInput = {
   supplier_id: string
-  employee_id: string
-  purchase_date: Date
+  purchase_code?: string
+  employee_id?: string
+  purchase_date?: Date
   purchase_details: CreatePurchaseDetailInput[]
 }
 

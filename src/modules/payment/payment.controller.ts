@@ -9,7 +9,6 @@ import { getSortingParams } from "@/utils/sorting"
 import { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { getUserFromToken } from "@/utils/cookie"
-import { CreatePaymentInput } from "./payment.type"
 
 export const paymentController = {
 
@@ -72,21 +71,19 @@ export const paymentController = {
     async createPayment(req: NextRequest) {
         try {
             const fd = await req.formData()
-
-            const body: CreatePaymentInput = {
+            const body = {
                 order_id: fd.get("order_id") as string,
                 amount: Number(fd.get("amount")),
                 method: fd.get("method") as string,
-
-                // 🔥 รับ file
                 file: fd.get("slip") as File
             }
-
             const payment = await paymentService.createPayment(body)
-
             return successResponse(payment, "Payment created successfully", 201)
         } catch (error) {
             console.log(error)
+            if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+                return errorResponse(error.message, error.statusCode);
+            }
             return errorResponse("Internal Server Error", 500)
         }
     },
@@ -102,7 +99,9 @@ export const paymentController = {
             console.log(error)
             if (
                 error instanceof BadRequestError ||
-                error instanceof NotFoundError
+                error instanceof NotFoundError ||
+                error instanceof ForbiddenError ||
+                error instanceof UnauthorizedError
             ) {
                 return errorResponse(error.message, error.statusCode)
             }

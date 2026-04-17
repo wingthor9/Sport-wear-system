@@ -5,17 +5,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { useForm, useFieldArray } from "react-hook-form"
+import { useForm, useFieldArray, Controller, SubmitHandler } from "react-hook-form"
 import { CreatePurchaseOrderInput, PurchaseOrder, UpdatePurchaseOrderInput } from "@/modules/purchase/purchase.type"
 import { Supplier } from "@/modules/supplier/supplier.type"
 import { Product } from "@/modules/product/product.types"
 import { UseMutationResult } from "@tanstack/react-query"
 import { PurchaseFormValues, purchaseSchema } from "@/schemas/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useAuth, useCreateProduct, useUpdateProduct } from "@/app/features/hooks"
+import { useCreateProduct, useUpdateProduct } from "@/app/features/hooks"
 import { ProductCombobox } from "./ProductCombobox"
 import { ProductFormDialog } from "../products/ProductFormDialog"
 import { Category } from "@/modules/category/category.type"
+import { NumericFormat } from "react-number-format"
 
 type Props = {
     open: boolean
@@ -30,7 +31,6 @@ type Props = {
 
 
 export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, create, update, suppliers, products, categories }: Props) {
-    const { user, isLoading } = useAuth()
     const [openProductDialog, setOpenProductDialog] = useState(false)
     const [tempIndex, setTempIndex] = useState<number | null>(null)
     const createProduct = useCreateProduct()
@@ -42,8 +42,6 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
         resolver: zodResolver(purchaseSchema),
         defaultValues: {
             supplier_id: "",
-            employee_id: "",
-            purchase_date: new Date(),
             purchase_details: []
         }
     })
@@ -58,7 +56,6 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
         if (purchaseOrder) {
             reset({
                 supplier_id: purchaseOrder.supplier_id,
-                employee_id: user.employee_id,
                 purchase_details:
                     purchaseOrder.purchase_details?.map(d => ({
                         product_id: d.product_id,
@@ -73,13 +70,13 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
     const addItem = () => {
         append({
             product_id: "",
-            quantity: 1,
+            quantity: 0,
             price: 0
         })
     }
 
     /* ---------------- SUBMIT ---------------- */
-    const onSubmit = async (data: PurchaseFormValues) => {
+    const onSubmit: SubmitHandler<PurchaseFormValues> = async (data) => {
         try {
             if (!data.supplier_id || data.purchase_details.length === 0) {
                 toast.error("Missing data")
@@ -88,8 +85,6 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
 
             const payload = {
                 supplier_id: data.supplier_id,
-                employee_id: user.employee_id,
-                purchase_date: new Date(),
                 purchase_details: data.purchase_details
             }
 
@@ -141,28 +136,21 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
                     <div className="space-y-3">
                         {fields.map((field, index) => (
                             <div key={field.id} className="flex gap-2">
-
                                 {/* PRODUCT */}
                                 <div>
-                                    {/* <select
-                                        {...register(`purchase_details.${index}.product_id` as const)}
-                                        className="border p-2"
-                                    >
-                                        <option value="">Select product</option>
-                                        {products.map(p => (
-                                            <option key={p.product_id} value={p.product_id}>
-                                                {p.product_name}
-                                            </option>
-                                        ))}
-                                    </select> */}
-
                                     <ProductCombobox
                                         products={products}
                                         value={watch(`purchase_details.${index}.product_id`)}
-                                        onChange={(val) =>
+                                        onChange={(val) => {
                                             setValue(`purchase_details.${index}.product_id`, val)
-                                        }
-                                        onCreateNew={() => {
+
+                                            const product = products.find(p => p.product_id === val)
+
+                                            setValue(
+                                                `purchase_details.${index}.price`,
+                                                product?.purchase_price || 0
+                                            )
+                                        }} onCreateNew={() => {
                                             setTempIndex(index)
                                             setOpenProductDialog(true)
                                         }}
@@ -172,27 +160,43 @@ export function PurchaseOrderFormDialog({ open, onOpenChange, purchaseOrder, cre
 
                                 {/* QTY */}
                                 <div>
-                                    <Input
-                                        type="number"
-                                        {...register(`purchase_details.${index}.quantity` as const, {
-                                            valueAsNumber: true
-                                        })}
-                                        placeholder="Qty"
+                                    <Controller
+                                        name={`purchase_details.${index}.quantity`}
+                                        control={control}
+                                        render={({ field }) => (
+                                            <NumericFormat
+                                                value={field.value === 0 ? "" : field.value}
+                                                customInput={Input}
+                                                placeholder="Qty"
+                                                thousandSeparator=","
+                                                allowNegative={false}
+                                                decimalScale={0}
+                                                onValueChange={(values) => {
+                                                    field.onChange(
+                                                        values.value === "" ? 0 : Number(values.value)
+                                                    )
+                                                }}
+                                            />
+                                        )}
                                     />
                                     <div className="h-6 text-red-500">{errors.purchase_details?.[index]?.quantity?.message}</div>
                                 </div>
 
-                                {/* PRICE */}
+                                {/* PRICE (READ ONLY FROM PRODUCT) */}
                                 <div>
-                                    <Input
-                                        type="number"
-                                        {...register(`purchase_details.${index}.price` as const, {
-                                            valueAsNumber: true
-                                        })}
-                                        placeholder="Price"
-                                    />
-                                    <div className="h-6 text-red-500">{errors.purchase_details?.[index]?.price?.message}</div>
+                                    <div className="px-3 py-2 border rounded bg-gray-100">
+                                        {products
+                                            .find(
+                                                (p) =>
+                                                    p.product_id ===
+                                                    watch(`purchase_details.${index}.product_id`)
+                                            )
+                                            ?.purchase_price?.toLocaleString() || 0}
+                                    </div>
 
+                                    <div className="h-6 text-red-500">
+                                        {errors.purchase_details?.[index]?.price?.message}
+                                    </div>
                                 </div>
 
                                 <Button

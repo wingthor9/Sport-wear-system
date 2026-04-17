@@ -24,8 +24,9 @@ export function ImportTable({ imports, isLoading, onView, onDelete }: Props) {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Purchase</TableHead>
+                        <TableHead>NO:</TableHead>
+                        <TableHead>Import code</TableHead>
+                        <TableHead>Purchase code</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Employee</TableHead>
                         <TableHead />
@@ -33,12 +34,13 @@ export function ImportTable({ imports, isLoading, onView, onDelete }: Props) {
                 </TableHeader>
 
                 <TableBody>
-                    {imports.map((i: Import) => (
+                    {imports.map((i,index) => (
                         <TableRow key={i.import_id}>
-                            <TableCell>{i.import_id}</TableCell>
-                            <TableCell>{i.purchase?.purchase_id}</TableCell>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{i.import_code}</TableCell>
+                            <TableCell>{i.purchase?.purchase_code}</TableCell>
                             <TableCell>
-                           {formatDate( i.import_date)}
+                           {formatDate(i.import_date)}
                             </TableCell>
                             <TableCell>{i.employee?.employee_name}</TableCell>
 

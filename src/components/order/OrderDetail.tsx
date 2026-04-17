@@ -11,7 +11,7 @@ export function OrderDetail({ order }: Props) {
         <div className="space-y-4">
 
             <div>
-                <p><b>Order ID:</b> {order.order_id}</p>
+                <p><b>Order code:</b> {order.order_code}</p>
                 <p><b>Status:</b> {order.status}</p>
                 <p><b>Date:</b> {new Date(order.order_date).toLocaleString()}</p>
             </div>
@@ -25,7 +25,7 @@ export function OrderDetail({ order }: Props) {
                         className="flex justify-between border p-2 rounded"
                     >
                         <span>{item.product?.product_name}</span>
-                        <span>{item.quantity} x ${item.price}</span>
+                        <span>{item.quantity} x {item.price}</span>
                     </div>
                 ))}
             </div>

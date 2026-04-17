@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 import { BadRequestError, NotFoundError } from "@/utils/response"
 import { CreatePurchaseOrderInput, UpdatePurchaseOrderInput } from "./purchase.type"
+import { generatePurchaseCode } from "@/utils/generateCode"
 
 export const purchaseService = {
     async getPurchases(options?: Prisma.PurchaseOrderFindManyArgs) {
@@ -47,10 +48,13 @@ export const purchaseService = {
             }
             const total = data.purchase_details.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
+            const code = generatePurchaseCode()
             const purchase = await tx.purchaseOrder.create({
                 data: {
                     supplier_id: data.supplier_id,
+                    purchase_code: code,
                     employee_id: userId,
+                    purchase_date: new Date(),
                     total_amount: total,
                     status: "pending",
                     purchase_details: {

@@ -30,6 +30,10 @@ export const generateOrderCode = () => {
 }
 
 
+export const generatePurchaseCode = () => {
+  return `PUR-${getTodayDate()}-${generateRandomString(5)}`
+}
+
 export const generateImportCode = () => {
   return `IMP-${getTodayDate()}-${generateRandomString(5)}`
 }

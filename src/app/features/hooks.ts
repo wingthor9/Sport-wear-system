@@ -844,7 +844,6 @@ export const useCreatePayment = () => {
 
 export const useVerifyPayment = () => {
     const qc = useQueryClient()
-
     return useMutation({
         mutationFn: ({
             id,

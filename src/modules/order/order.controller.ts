@@ -6,7 +6,6 @@ import { getSortingParams } from "@/utils/sorting"
 import { BadRequestError, errorResponse, ForbiddenError, NotFoundError, successResponse, UnauthorizedError } from "@/utils/response"
 import { Prisma } from "@prisma/client"
 import { NextRequest } from "next/server"
-import { CreateOrderInput } from "./order.types"
 
 export const orderController = {
     async getOrders(req: NextRequest) {
@@ -60,7 +59,7 @@ export const orderController = {
 
     async createOrder(req: NextRequest) {
         try {
-            const body: CreateOrderInput = await req.json()
+            const body = await req.json()
             const order = await orderService.createOrder(body)
             return successResponse(order, "Create order successfully", 201)
         } catch (error) {

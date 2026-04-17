@@ -15,9 +15,7 @@ export default function ImageUpload({ files, setFiles, max = 5 }: Props) {
 
     const handleFiles = (newFiles: FileList | null) => {
         if (!newFiles) return
-
         const fileArray = Array.from(newFiles)
-
         const updated = [...files, ...fileArray].slice(0, max)
         setFiles(updated)
     }
@@ -29,7 +27,6 @@ export default function ImageUpload({ files, setFiles, max = 5 }: Props) {
 
     return (
         <div className="space-y-4">
-
             {/* drop zone */}
             <div
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer

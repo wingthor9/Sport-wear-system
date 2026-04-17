@@ -3,11 +3,20 @@ import { z } from "zod"
 /* ----------------------------- Start Product Schema ----------------------------- */
 export const productSchema = z.object({
   product_name: z.string().min(1, "Product name is required"),
-  sale_price: z.string().min(1, "Price is required"),
-  stock_qty: z.string().min(1, "Stock quantity is required"),
+  purchase_price: z.number().min(1, "Purchase price is required"),
+  sale_price: z.number().min(1, "Sale price is required"),
+  stock_qty: z.number().min(1, "Stock quantity is required"),
   category_id: z.string().min(1, "Category is required"),
   description: z.string().optional()
 })
+// export const productSchema = z.object({
+//   product_name: z.string().min(1, "Required"),
+//   purchase_price: z.coerce.number().min(0),
+//   sale_price: z.coerce.number().min(0),
+//   stock_qty: z.coerce.number().min(0),
+//   category_id: z.string().min(1, "Required"),
+//   description: z.string().optional()
+// });
 export type ProductFormValues = z.infer<typeof productSchema>
 /* ----------------------------- Start Product Schema ----------------------------- */
 
@@ -66,13 +75,11 @@ export type SupplierUpdateInput = z.infer<typeof supplierUpdateSchema>
 // Purchase Schema
 export const purchaseDetailSchema = z.object({
   product_id: z.string(),
-  quantity: z.number().min(1),
-  price: z.number().min(0)
+  quantity: z.number().min(1, "Quantity is required"),
+  price: z.number().min(1, "Price is required")
 })
 export const purchaseSchema = z.object({
   supplier_id: z.string(),
-  employee_id: z.string(),
-  purchase_date: z.date().optional(),
   purchase_details: z.array(purchaseDetailSchema)
 })
 export type PurchaseFormValues = z.infer<typeof purchaseSchema>

@@ -17,7 +17,7 @@ export type ImportDetail = {
 export type Import = {
     import_id: string
     import_code?: string
-    import_date?: Date
+    import_date: Date
     purchase_id: string
     employee_id?: string
     purchase?: PurchaseOrder

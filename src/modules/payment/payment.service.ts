@@ -67,19 +67,15 @@ export const paymentService = {
 
     async createPayment(data: CreatePaymentInput) {
         return prisma.$transaction(async (tx) => {
-
             const order = await tx.order.findUnique({
                 where: { order_id: data.order_id }
             })
-
             if (!order) {
                 throw new NotFoundError("Order not found")
             }
-
             if (order.status !== "WAITING_PAYMENT") {
                 throw new BadRequestError("Order is not waiting for payment")
             }
-
             const existingPayment = await tx.payment.findUnique({
                 where: { order_id: data.order_id }
             })
@@ -102,8 +98,8 @@ export const paymentService = {
             const payment = await tx.payment.create({
                 data: {
                     order_id: data.order_id,
-                    amount: data.amount,
                     method: data.method,
+                    amount: data.amount,
                     slip_url,
                     public_id,
                     status: "PENDING"
@@ -119,15 +115,12 @@ export const paymentService = {
             const payment = await tx.payment.findUnique({
                 where: { payment_id: id }
             })
-
             if (!payment) {
                 throw new NotFoundError("Payment not found")
             }
-
             if (payment.status !== "PENDING") {
                 throw new BadRequestError("Payment already processed")
             }
-
             const updatedPayment = await tx.payment.update({
                 where: { payment_id: id },
                 data: {

@@ -14,13 +14,13 @@ export function PaymentVerifyDialog({ open, onOpenChange, payment, onConfirm}: P
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Verify Payment</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div>
-                        Order: {payment?.order_id}
+                        Order code: {payment?.order.order_code}
                     </div>
                     <div>
                         Amount: {payment?.amount}
@@ -29,14 +29,14 @@ export function PaymentVerifyDialog({ open, onOpenChange, payment, onConfirm}: P
                         <Image
                             src={payment.slip_url}
                             className="w-full rounded"
-                            width={200}
-                            height={200}
+                            width={150}
+                            height={150}
                             alt="slip"
                         />
                     )}
                     <div className="flex gap-2">
                         <Button
-                            className="w-full"
+                            className="w-1/2"
                             onClick={() => onConfirm("VERIFIED")}
                         >
                             Approve
@@ -44,7 +44,7 @@ export function PaymentVerifyDialog({ open, onOpenChange, payment, onConfirm}: P
 
                         <Button
                             variant="destructive"
-                            className="w-full"
+                            className="w-1/2"
                             onClick={() => onConfirm("REJECTED")}
                         >
                             Reject

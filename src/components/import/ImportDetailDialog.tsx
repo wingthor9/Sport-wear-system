@@ -101,19 +101,22 @@ export function ImportDetail({ open, onOpenChange, data }: Props) {
                                 </TableRow>
                             )}
                         </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell colSpan={3} className="text-right font-bold text-lg">
+                                    Total:
+                                </TableCell>
+
+                                <TableCell className="text-right font-bold text-lg">
+                                    {data?.import_details?.reduce(
+                                        (sum, item) => sum + item.quantity * item.cost_price,
+                                        0
+                                    )} KIP
+                                </TableCell>
+                            </TableRow>
+                        </TableFooter>
                     </Table>
                 </div>
-                <TableFooter className="flex justify-end items-center">
-                    <TableRow>
-                        <TableHead className="text-right font-bold text-lg">Total: </TableHead>
-                        <TableHead className="text-right font-bold text-lg">
-                            {data?.import_details?.reduce(
-                                (sum, item) => sum + item.quantity * item.cost_price,
-                                0
-                            )} KIP
-                        </TableHead>
-                    </TableRow>
-                </TableFooter>
             </DialogContent>
         </Dialog>
     )

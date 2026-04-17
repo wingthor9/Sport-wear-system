@@ -1,14 +1,8 @@
-import {
-    Table,
-    TableHeader,
-    TableRow,
-    TableHead,
-    TableBody,
-    TableCell
-} from "@/components/ui/table"
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { Payment } from "@/modules/payment/payment.type"
+import { Eye } from "lucide-react"
 
 type Props = {
     payments: Payment[]
@@ -25,7 +19,8 @@ export function PaymentTable({ payments, isLoading, onVerify }: Props) {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Order</TableHead>
+                        <TableHead>NO:</TableHead>
+                        <TableHead>Order code</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Slip</TableHead>
@@ -35,9 +30,10 @@ export function PaymentTable({ payments, isLoading, onVerify }: Props) {
 
                 <TableBody>
                     {payments.length ? (
-                        payments.map((p) => (
+                        payments.map((p, index) => (
                             <TableRow key={p.payment_id}>
-                                <TableCell>{p.order_id}</TableCell>
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>{p.order?.order_code}</TableCell>
                                 <TableCell>{p.amount}</TableCell>
                                 <TableCell>{p.status}</TableCell>
 
@@ -54,6 +50,9 @@ export function PaymentTable({ payments, isLoading, onVerify }: Props) {
                                 </TableCell>
 
                                 <TableCell className="text-right">
+                                    {/* <Button size="sm" variant="ghost" onClick={() => onView(o)}>
+                                        <Eye className="w-4 h-4" />
+                                    </Button> */}
                                     {p.status === "PENDING" && (
                                         <Button size="sm" onClick={() => onVerify(p)}>
                                             Verify

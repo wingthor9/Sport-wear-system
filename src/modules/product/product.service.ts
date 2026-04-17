@@ -54,6 +54,7 @@ export const productService = {
         product_name: data.product_name,
         product_code: code,
         description: data.description,
+        purchase_price: data.purchase_price,
         sale_price: data.sale_price,
         stock_qty: data.stock_qty,
         category_id: data.category_id,
@@ -118,6 +119,7 @@ export const productService = {
       data: {
         product_name: data.product_name,
         sale_price: data.sale_price,
+        purchase_price: data.purchase_price,
         stock_qty: data.stock_qty,
         description: data.description,
         category_id: data.category_id,

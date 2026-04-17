@@ -1,5 +1,7 @@
 // modules/payment/payment.types.ts
 
+import { Order } from "../order/order.types"
+
 export type PaymentStatus =
     | "PENDING"
     | "VERIFIED"
@@ -7,6 +9,7 @@ export type PaymentStatus =
 
 export type Payment = {
     payment_id: string
+    order: Order
     payment_date: string
     amount: number
     method?: string
@@ -20,6 +23,7 @@ export type Payment = {
 
 export type CreatePaymentInput = {
     order_id: string
+    order_code?: string
     amount: number
     method?: string
     slip_url?: string
