@@ -2,8 +2,8 @@
 
 import { prisma } from "@/lib/prisma"
 import { BadRequestError, NotFoundError } from "@/utils/response"
-import { CreatePaymentInput, VerifyPaymentInput } from "./payment.type"
-import { Prisma } from "@prisma/client"
+import { CreatePaymentInput, VerifyPaymentInput, Payment } from './payment.type';
+import { OrderStatus, PaymentMethod, PaymentStatus, Prisma } from "@prisma/client"
 import { convertFileToBase64, uploadMultipleImages } from "@/utils/cloudinary"
 
 export const paymentService = {
@@ -73,7 +73,7 @@ export const paymentService = {
             if (!order) {
                 throw new NotFoundError("Order not found")
             }
-            if (order.status !== "WAITING_PAYMENT") {
+            if (order.status !== OrderStatus.WAITING_PAYMENT) {
                 throw new BadRequestError("Order is not waiting for payment")
             }
             const existingPayment = await tx.payment.findUnique({
@@ -98,11 +98,11 @@ export const paymentService = {
             const payment = await tx.payment.create({
                 data: {
                     order_id: data.order_id,
-                    method: data.method,
+                    method: data.method as PaymentMethod,
                     amount: data.amount,
                     slip_url,
                     public_id,
-                    status: "PENDING"
+                    status: PaymentStatus.PENDING
                 }
             })
 
@@ -118,7 +118,7 @@ export const paymentService = {
             if (!payment) {
                 throw new NotFoundError("Payment not found")
             }
-            if (payment.status !== "PENDING") {
+            if (payment.status !== PaymentStatus.PENDING) {
                 throw new BadRequestError("Payment already processed")
             }
             const updatedPayment = await tx.payment.update({
@@ -131,11 +131,11 @@ export const paymentService = {
             })
 
             // 🔥 ถ้า verified → update order
-            if (data.status === "VERIFIED") {
+            if (data.status === PaymentStatus.VERIFIED) {
                 await tx.order.update({
                     where: { order_id: payment.order_id },
                     data: {
-                        status: "PAID"
+                        status: OrderStatus.PAID
                     }
                 })
             }
@@ -152,7 +152,7 @@ export const paymentService = {
             throw new NotFoundError("Payment not found")
         }
 
-        if (payment.status === "VERIFIED") {
+        if (payment.status === PaymentStatus.VERIFIED) {
             throw new BadRequestError("Cannot delete verified payment")
         }
 

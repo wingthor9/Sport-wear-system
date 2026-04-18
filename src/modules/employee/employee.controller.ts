@@ -5,7 +5,6 @@ import { getSortingParams } from "@/utils/sorting"
 import { Prisma } from "@prisma/client"
 import { NextRequest } from "next/server"
 import { employeeService } from "./employee.service"
-import { UpdateEmployeeInput } from "./employee.type"
 import { BadRequestError, errorResponse, ForbiddenError, NotFoundError, successResponse, UnauthorizedError } from "@/utils/response"
 
 export const employeeController = {
@@ -58,9 +57,9 @@ export const employeeController = {
     },
 
 
-    async updateEmployee(req: Request, id: string) {
+    async updateEmployee(req: NextRequest, id: string) {
         try {
-            const body: UpdateEmployeeInput = await req.json()
+            const body = await req.json()
             const employee = await employeeService.updateEmployee(id, body)
             return successResponse(employee, "Update employee successfully", 200)
         } catch (error) {

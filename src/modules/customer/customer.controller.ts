@@ -64,7 +64,7 @@ export const customerController = {
 
     async createCustomer(req: NextRequest) {
         try {
-            const body: CreateCustomerInput = await req.json()
+            const body = await req.json()
             const customer = await customerService.createCustomer(body)
             return successResponse(customer, "Create customer successfully", 201)
         } catch (error) {

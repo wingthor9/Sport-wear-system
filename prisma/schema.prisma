@@ -360,18 +360,13 @@ model Payment {
   amount       Int
   method       PaymentMethod @default(CASH)
   status       PaymentStatus @default(PENDING)
-
   slip_url     String?     // รูปสลิป (Cloudinary)
   public_id    String?     // ไว้ลบรูป
-
   verified_by  String?     // employee_id
   verified_at  DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-
   order_id String @unique
-
   order Order @relation(fields: [order_id], references: [order_id])
 }
 
@@ -389,17 +384,63 @@ enum PaymentStatus {
 
 model Delivery {
   delivery_id String @id @default(uuid())
-  address     String
-  status      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  status DeliveryStatus @default(PENDING)
+  tracking_number String?
+  provider String? @default("Anousith Express")
   order_id String @unique
   order Order @relation(fields: [order_id], references: [order_id])
+  address_id String
+  address AddressBranch @relation(fields: [address_id], references: [address_id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AddressBranch {
+  address_id String @id @default(uuid())
+
+  province_id String
+  district_id String
+  branch_id String
+
+  province Province @relation(fields: [province_id], references: [province_id])
+  district District @relation(fields: [district_id], references: [district_id])
+  branch   Branch   @relation(fields: [branch_id], references: [branch_id])
+
+  deliveries Delivery[]
+}
+
+model Province {
+  province_id String @id @default(uuid())
+  Province_name String
+
+  districts District[]
+  addressBranches AddressBranch[]
+}
+
+model District {
+  district_id String @id @default(uuid())
+  district_name String
+
+  province_id String
+  province Province @relation(fields: [province_id], references: [province_id], onDelete: Cascade)
+
+  branches Branch[]
+  addressBranches AddressBranch[]
+}
+
+model Branch {
+  branch_id String @id @default(uuid())
+  branch_name String
+
+  district_id String
+  district District @relation(fields: [district_id], references: [district_id], onDelete: Cascade)
+
+  addressBranches AddressBranch[]
 }
 
 enum DeliveryStatus {
   PENDING
+  PROCESSING
   SHIPPED
   DELIVERED
   CANCELLED
@@ -411,7 +452,6 @@ model Point {
   date         DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   customer_id String
   customer Customer @relation(fields: [customer_id], references: [customer_id], onDelete: Cascade)
 }

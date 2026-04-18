@@ -1,7 +1,8 @@
+import { use } from './hooks';
 
 "use client"
 
-import { adminApi, adminAuthApi, categoryApi, customerApi, importApi, orderApi, paymentApi, productApi, purchaseApi, refundApi, saleApi, supplierApi } from "./api"
+import { adminApi, adminAuthApi, categoryApi, customerApi, DeliveryApi, importApi, orderApi, paymentApi, productApi, purchaseApi, refundApi, saleApi, supplierApi } from "./api"
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import { CreateCustomerInput, UpdateCustomerInput } from "@/modules/customer/customer.type"
 import { CreateEmployeeInput, UpdateEmployeeInput } from "@/modules/employee/employee.type"
@@ -14,6 +15,7 @@ import { CreateRefundInput } from "@/modules/refund/refund.type"
 import { ForgotPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
 import { CreateImportInput } from '@/modules/import/import.type';
 import { CreatePaymentInput, VerifyPaymentInput } from '@/modules/payment/payment.type';
+import { CreateDeliveryInput, UpdateDeliveryInput } from "@/modules/delivery/delivery.type"
 
 
 export type UseGetParams = {
@@ -864,5 +866,76 @@ export const useVerifyPayment = () => {
 
 
 // --------------------------------------------------------  Payment end -----------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------  Delivery start -----------------------------------------------------------------------
+
+
+
+export const useGetDeliveries = (params?: UseGetParams) => {
+    return useQuery({
+        queryKey: ["deliveries", params],
+        queryFn: () => DeliveryApi.getAll(params),
+        placeholderData: keepPreviousData,
+    })
+}
+
+
+export const useGetDelivery = (id: string) => {
+    return useQuery({
+        queryKey: ["delivery", id],
+        queryFn: () => DeliveryApi.getById(id),
+        enabled: !!id
+    })
+}
+
+
+export const useCreateDelivery = () => {
+    const qc = useQueryClient()
+
+    return useMutation({
+        mutationFn: (data: CreateDeliveryInput) => DeliveryApi.create(data),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["deliveries"] })
+        }
+    })
+}
+
+
+
+export const useUpdateDelivery = () => {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      data
+    }: {
+      id: string
+      data: UpdateDeliveryInput
+    }) => DeliveryApi.update(id, data),
+
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["deliveries"] })
+    }
+  })
+}
+
+
+// --------------------------------------------------------  Delivery end -----------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------  Location start -----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+// --------------------------------------------------------  Location end -----------------------------------------------------------------------
 
 

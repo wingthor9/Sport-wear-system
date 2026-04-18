@@ -14,6 +14,7 @@ import { ForgotPasswordInput, ResetPasswordInput, VerifyOTPInput } from "@/modul
 import { isAxiosError } from "axios"
 import { CreateImportInput, Import } from "@/modules/import/import.type"
 import { CreatePaymentInput, Payment, VerifyPaymentInput } from "@/modules/payment/payment.type"
+import { CreateDeliveryInput, Delivery, UpdateDeliveryInput } from '../../modules/delivery/delivery.type';
 
 
 export type GetParams = {
@@ -692,12 +693,58 @@ export const paymentApi = {
     await axiosInstance.delete(`/payment/${id}`)
   }
 
-
-
-
 }
 
 
 
 // --------------------------------------------------------  Payment end -----------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------  Delivery start -----------------------------------------------------------------------
+
+
+
+export const DeliveryApi = {
+
+  getAll: async (params?: GetParams): Promise<{
+    data: Delivery[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const res = await axiosInstance.get("/delivery", {
+      params
+    })
+
+    return res.data.data
+  },
+
+  getById: async (id: string): Promise<Delivery> => {
+    const res = await axiosInstance.get(`/delivery/${id}`)
+    return res.data.data
+  },
+
+  create: async (data: CreateDeliveryInput): Promise<Delivery> => {
+    const res = await axiosInstance.post("/delivery", data)
+    return res.data.data
+  },
+
+  update: async (
+    id: string,
+    data: UpdateDeliveryInput
+  ) => {
+    const res = await axiosInstance.put(
+      `/delivery/${id}`,
+      data
+    )
+    return res.data.data
+  }
+}
+
+
+// --------------------------------------------------------  Delivery end -----------------------------------------------------------------------
 

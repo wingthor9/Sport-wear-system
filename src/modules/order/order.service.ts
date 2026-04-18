@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { Prisma } from "@prisma/client"
+import { OrderStatus, Prisma } from "@prisma/client"
 import { CreateOrderInput } from "./order.types"
 import { BadRequestError, NotFoundError } from "@/utils/response"
 import { generateOrderCode } from "@/utils/generateCode"
@@ -86,7 +86,7 @@ export const orderService = {
                     customer_id: data.customer_id,
                     order_code: code ,
                     total_amount,
-                    status: "WAITING_PAYMENT",
+                    status: OrderStatus.WAITING_PAYMENT,
                     order_details: {
                         create: data.order_details
                     }
@@ -136,7 +136,7 @@ export const orderService = {
                 throw new BadRequestError("Cannot delete order with delivery")
             }
 
-            if (existing.status !== "WAITING_PAYMENT") {
+            if (existing.status !== OrderStatus.WAITING_PAYMENT) {
                 throw new BadRequestError("Only waiting payment order can be deleted")
             }
 

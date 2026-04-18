@@ -25,7 +25,7 @@ export type CreatePaymentInput = {
     order_id: string
     order_code?: string
     amount: number
-    method?: string
+    method: string
     slip_url?: string
     public_id?: string
     file?: File
