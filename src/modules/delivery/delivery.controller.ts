@@ -41,7 +41,7 @@ export const deliveryController = {
             return errorResponse("Internal Server Error", 500)
         }
     },
-    async getDelivery(req: NextRequest, id: string) {
+    async getDelivery(id: string) {
         try {
             const data = await deliveryService.getDelivery(id)
             return successResponse(data, "Delivery fetched successfully", 200)

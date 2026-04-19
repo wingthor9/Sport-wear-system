@@ -42,3 +42,11 @@ export const generateImportCode = () => {
 export const generateRefundCode = () => {
   return `REF-${getTodayDate()}-${generateRandomString(5)}`
 }
+
+export const generateTrackingCode = () => {
+  return `TRK-${getTodayDate()}-${generateRandomString(5)}`
+}
+
+export const generatePaymentCode = () => {
+  return `PAY-${getTodayDate()}-${generateRandomString(5)}`
+}

@@ -28,6 +28,8 @@ const navigation: NavItem[] = [
     { name: "Suppliers", href: "/supplier", icon: Store, roles: ["ADMIN"] },
     { name: "Customers", href: "/customer", icon: Users, roles: ["ADMIN"] },
     { name: "Employees", href: "/employee", icon: UserCog, roles: ["ADMIN"] },
+    { name: "Locations", href: "/location", icon: Store, roles: ["ADMIN"] },
+    { name: "Delivery", href: "/delivery", icon: ShoppingBag, roles: ["ADMIN"] },
     { name: "Reports", href: "/report", icon: BarChart3, roles: ["ADMIN"] },
     { name: "Settings", href: "/setting", icon: Settings, roles: ["ADMIN"] },
 ]

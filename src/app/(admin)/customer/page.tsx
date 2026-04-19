@@ -19,24 +19,6 @@ export default function CustomerPage() {
     const updateStatus = useUpdateCustomerStatus()
     const customers = data?.data ?? []
 
-    // console.log("customer : ",customers)
-
-
-    // const toggleSelect = (id: string) => {
-    //     setSelectedCustomers(prev =>
-    //         prev.includes(id)
-    //             ? prev.filter(x => x !== id)
-    //             : [...prev, id]
-    //     )
-    // }
-
-    // const handleBulkDelete = () => {
-    //     if (!confirm("Change status of customers?")) return
-    //     selectedCustomers.forEach(id => {
-    //         updateStatus.mutate(id)
-    //     })
-    //     setSelectedCustomers([])
-    // }
 
     const handleEdit = (customer: Customer) => {
         setSelectedCustomers(customer)

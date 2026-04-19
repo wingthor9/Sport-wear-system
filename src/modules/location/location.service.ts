@@ -1,27 +1,61 @@
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
+import { CreateBranchInput, CreateDistrictInput, CreateProvinceInput } from "./location.type"
 export const locationService = {
 
   async getProvinces(options?: Prisma.ProvinceFindManyArgs) {
-    const provinces = await prisma.province.findMany({ ...options })
+    const provinces = await prisma.province.findMany({
+      ...options,
+      include: {
+        districts: {
+          include: {
+            branches: true
+          }
+        },
+        addressBranches: true
+      }
+    })
     return provinces
   },
 
-  // GET DISTRICT BY PROVINCE
-  async getDistrictsByProvince(province_id: string) {
-    return prisma.district.findMany({
-      where: { province_id },
-      include: { province: true }
+  async getDistricts(options?: Prisma.DistrictFindManyArgs) {
+    const districts = await prisma.district.findMany({
+      ...options,
+      include: {
+        province: true,
+        branches: true,
+        addressBranches: true
+      }
     })
+    return districts
   },
 
-  // GET BRANCH BY DISTRICT
-  async getBranchesByDistrict(district_id: string) {
-    return prisma.branch.findMany({
-      where: { district_id },
-      include: { district: true }
+  async getBranches(options?: Prisma.BranchFindManyArgs) {
+    const branches = await prisma.branch.findMany({
+      ...options,
+      include: {
+        district: true,
+        addressBranches: true
+      }
     })
+    return branches
   },
+
+  // GET DISTRICT BY PROVINCE
+  // async getDistrictByProvince(province_id: string) {
+  //   return prisma.district.findUnique({
+  //     where: {  },
+  //     // include: { province: true }
+  //   })
+  // },
+
+  // // GET BRANCH BY DISTRICT
+  // async getBranchByDistrict(district_id: string) {
+  //   return prisma.branch.findUnique({
+  //     where: { district_id },
+  //     include: { district: true }
+  //   })
+  // },
 
   // GET PROVINCE
   async getProvince(id: string) {
@@ -49,15 +83,15 @@ export const locationService = {
 
 
 
-  async createProvince(data: { name: string }) {
+  async createProvince(data: CreateProvinceInput) {
     return prisma.province.create({ data })
   },
 
-  async createDistrict(data: { name: string, province_id: string }) {
+  async createDistrict(data: CreateDistrictInput) {
     return prisma.district.create({ data })
   },
 
-  async createBranch(data: { name: string, district_id: string }) {
+  async createBranch(data: CreateBranchInput) {
     return prisma.branch.create({ data })
   },
 
@@ -79,15 +113,15 @@ export const locationService = {
 
 
 
-  async updateProvince(id: string, data: { province_name: string }) {
+  async updateProvince(id: string, data: CreateProvinceInput) {
     return prisma.province.update({ where: { province_id: id }, data })
   },
 
-  async updateDistrict(id: string, data: { district_name: string }) {
+  async updateDistrict(id: string, data: CreateDistrictInput) {
     return prisma.district.update({ where: { district_id: id }, data })
   },
 
-  async updateBranch(id: string, data: { branch_name: string }) {
+  async updateBranch(id: string, data: CreateBranchInput) {
     return prisma.branch.update({ where: { branch_id: id }, data })
   },
 

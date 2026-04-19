@@ -171,3 +171,35 @@ export const adminAuthSchema = z.object({
   username: z.string(), password: z.string()
 })
 export type AdminAuthInput = z.infer<typeof adminAuthSchema>
+
+
+// Location Schema
+export const locationSchema = z.object({
+  province_id: z.string(),
+  district_id: z.string(),
+  branch_id: z.string(),
+})
+export type LocationInput = z.infer<typeof locationSchema>
+
+
+//  Province Schema
+export const provinceSchema = z.object({
+  province_name: z.string(),
+})
+export type ProvinceFormValues = z.infer<typeof provinceSchema>
+
+
+// District Schema
+export const districtSchema = z.object({
+  province_id: z.string(),
+  district_name: z.string(),
+})
+export type DistrictFormValues = z.infer<typeof districtSchema>
+
+
+// Branch Schema
+export const branchSchema = z.object({
+  district_id: z.string(),
+  branch_name: z.string(),
+})
+export type BranchFormValues = z.infer<typeof branchSchema>

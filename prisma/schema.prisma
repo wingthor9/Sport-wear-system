@@ -407,14 +407,35 @@ model AddressBranch {
   branch   Branch   @relation(fields: [branch_id], references: [branch_id])
 
   deliveries Delivery[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([province_id, district_id, branch_id]) 
+}
+
+model AddressBranch {
+  address_id String @id @default(uuid())
+
+  province_id String
+  district_id String
+  branch_id String
+
+  province Province @relation(fields: [province_id], references: [province_id])
+  district District @relation(fields: [district_id], references: [district_id])
+  branch   Branch   @relation(fields: [branch_id], references: [branch_id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([province_id, district_id, branch_id]) // 🔥 กัน duplicate
 }
 
 model Province {
   province_id String @id @default(uuid())
-  Province_name String
+  province_name String
 
   districts District[]
   addressBranches AddressBranch[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model District {
@@ -426,6 +447,8 @@ model District {
 
   branches Branch[]
   addressBranches AddressBranch[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Branch {
@@ -436,6 +459,8 @@ model Branch {
   district District @relation(fields: [district_id], references: [district_id], onDelete: Cascade)
 
   addressBranches AddressBranch[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum DeliveryStatus {

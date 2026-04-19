@@ -9,11 +9,6 @@ import { prisma } from "@/lib/prisma"
 
 export const locationController = {
 
-    // async getProvinces() {
-    //     const data = await locationService.getProvinces()
-    //     return successResponse(data, "Provinces")
-    // },
-
     async getProvinces(req: NextRequest) {
         try {
             const { page, limit, skip } = getPaginationParams(req)
@@ -47,10 +42,30 @@ export const locationController = {
         }
     },
 
-    async getDistricts(id: string) {
+    async getDistricts(req: NextRequest) {
         try {
-            const district = await locationService.getDistrictsByProvince(id)
-            return successResponse(district, "Get Districts by province successfully")
+            const { page, limit, skip } = getPaginationParams(req)
+            const search = getSearchParam(req)
+            const orderBy = getSortingParams(req)
+            const where: Prisma.DistrictWhereInput = search
+                ? {
+                    district_name: {
+                        contains: search,
+                        mode: "insensitive"
+                    }
+                }
+                : {}
+            const [districts, total] = await Promise.all([
+                locationService.getDistricts({
+                    where,
+                    skip,
+                    take: limit,
+                    orderBy
+                }),
+                prisma.district.count({ where })
+            ])
+            const meta = getPaginationMeta(total, page, limit)
+            return successResponse({ data: districts, meta }, "Get districts successfully", 200)
         } catch (error) {
             console.log(error)
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
@@ -60,22 +75,112 @@ export const locationController = {
         }
     },
 
-    async getBranches(id: string) {
+
+    async getBranches(req: NextRequest) {
         try {
-            const branch = await locationService.getBranchesByDistrict(id)
-            return successResponse(branch, "Get Branches by district successfully")
+            const { page, limit, skip } = getPaginationParams(req)
+            const search = getSearchParam(req)
+            const orderBy = getSortingParams(req)
+            const where: Prisma.BranchWhereInput = search
+                ? {
+                    branch_name: {
+                        contains: search,
+                        mode: "insensitive"
+                    }
+                }
+                : {}
+            const [branches, total] = await Promise.all([
+                locationService.getBranches({
+                    where,
+                    skip,
+                    take: limit,
+                    orderBy
+                }),
+                prisma.branch.count({ where })
+            ])
+            const meta = getPaginationMeta(total, page, limit)
+            return successResponse({ data: branches, meta }, "Get branches successfully", 200)
         } catch (error) {
             console.log(error)
             if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
                 return errorResponse(error.message, error.statusCode);
-
             }
             return errorResponse("Internal Server Error", 500)
         }
+
     },
 
 
-    async getProvince (id: string) {
+    // async getDistrictByProvince(req: NextRequest) {
+    //     try {
+    //         const { page, limit, skip } = getPaginationParams(req)
+    //         const search = getSearchParam(req)
+    //         const orderBy = getSortingParams(req)
+    //         const where: Prisma.DistrictWhereInput = search
+    //             ? {
+    //                 district_name: {
+    //                     contains: search,
+    //                     mode: "insensitive"
+    //                 }
+    //             }
+    //             : {}
+    //         const [districts, total] = await Promise.all([
+    //             locationService.getDistrictByProvince({
+    //                 where,
+    //                 skip,
+    //                 take: limit,
+    //                 orderBy
+    //             }),
+    //             prisma.district.count({ where })
+    //         ])
+    //         const meta = getPaginationMeta(total, page, limit)
+    //         return successResponse({ data: districts, meta }, "Get districts successfully", 200)
+    //     } catch (error) {
+    //         console.log(error)
+    //         if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+    //             return errorResponse(error.message, error.statusCode);
+    //         }
+    //         return errorResponse("Internal Server Error", 500)
+    //     }
+    // },
+
+
+    // async getBranchByDistrict(req: NextRequest) {
+    //     try {
+    //         const { page, limit, skip } = getPaginationParams(req)
+    //         const search = getSearchParam(req)
+    //         const orderBy = getSortingParams(req)
+    //         const where: Prisma.BranchWhereInput = search
+    //             ? {
+    //                 branch_name: {
+    //                     contains: search,
+    //                     mode: "insensitive"
+    //                 }
+    //             }
+    //             : {}
+    //         const [branches, total] = await Promise.all([
+    //             locationService.getBranchByDistrict({
+    //                 where,
+    //                 skip,
+    //                 take: limit,
+    //                 orderBy
+    //             }),
+    //             prisma.branch.count({ where })
+    //         ])
+    //         const meta = getPaginationMeta(total, page, limit)
+    //         return successResponse({ data: branches, meta }, "Get branches successfully", 200)
+    //     } catch (error) {
+    //         console.log(error)
+    //         if (error instanceof BadRequestError || error instanceof NotFoundError || error instanceof ForbiddenError || error instanceof UnauthorizedError) {
+    //             return errorResponse(error.message, error.statusCode);
+    //         }
+    //         return errorResponse("Internal Server Error", 500)
+    //     }
+
+    // },
+
+
+    async getProvince(id: string) {
         try {
             const province = await locationService.getProvince(id)
             return successResponse(province, "Get province successfully")
@@ -88,7 +193,7 @@ export const locationController = {
         }
     },
 
-    async getDistrict (id: string) {
+    async getDistrict(id: string) {
         try {
             const district = await locationService.getDistrict(id)
             return successResponse(district, "Get district successfully")
@@ -101,7 +206,7 @@ export const locationController = {
         }
     },
 
-    async getBranch (id: string) {
+    async getBranch(id: string) {
         try {
             const branch = await locationService.getBranch(id)
             return successResponse(branch, "Get branch successfully")
