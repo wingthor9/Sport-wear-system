@@ -46,4 +46,7 @@ export type UpdateDeliveryInput = {
 export type CreateDeliveryInput = {
     order_id: string
     address_id: string
+    province_id: string
+    district_id: string
+    branch_id: string
 }

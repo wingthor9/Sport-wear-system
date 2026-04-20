@@ -24,7 +24,7 @@ const navigation: NavItem[] = [
     { name: "Imports", href: "/import", icon: ShoppingBag, roles: ["ADMIN"] },
     { name: "Payments", href: "/payment", icon: CreditCard, roles: ["ADMIN"] },
     { name: "Product", href: "/product", icon: Package, roles: ["ADMIN"] },
-    { name: "Categories", href: "/category", icon: Store, roles: ["ADMIN"] },
+    { name: "Categories", href: "/category", icon: Store, roles: ["ADMIN","STAFF"] },
     { name: "Suppliers", href: "/supplier", icon: Store, roles: ["ADMIN"] },
     { name: "Customers", href: "/customer", icon: Users, roles: ["ADMIN"] },
     { name: "Employees", href: "/employee", icon: UserCog, roles: ["ADMIN"] },
@@ -41,21 +41,23 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
     const { mutate: logout, isPending } = useAdminLogout()
     const [collapsed, setCollapsed] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
+    console.log("user : ", user.role)
 
     useEffect(() => {
         if (isLoading) return;
-        if (!user || user === null) {
-            router.replace("/login")
-        }
-        if (user) {
-             getRedirectPath(user.role)
-            // ป้องกัน redirect loop
-            // if (pathname !== redirectPath) {
-            //     router.replace(redirectPath)
-            // }
+
+        if (!user) {
+            router.replace("/login");
+            return;
         }
 
-    }, [user, isLoading, pathname, router])
+        getRedirectPath(user.role);
+
+        // if (pathname !== target) {
+        //     router.replace(target);
+        // }
+
+    }, [user, isLoading, pathname]);
     if (isLoading) return null
 
     // console.log("user : ",user)

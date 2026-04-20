@@ -384,15 +384,21 @@ enum PaymentStatus {
 
 model Delivery {
   delivery_id String @id @default(uuid())
+
   status DeliveryStatus @default(PENDING)
   tracking_number String?
   provider String? @default("Anousith Express")
+
   order_id String @unique
-  order Order @relation(fields: [order_id], references: [order_id])
+  order Order @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+
   address_id String
   address AddressBranch @relation(fields: [address_id], references: [address_id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([address_id])
 }
 
 model AddressBranch {
@@ -407,25 +413,14 @@ model AddressBranch {
   branch   Branch   @relation(fields: [branch_id], references: [branch_id])
 
   deliveries Delivery[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@unique([province_id, district_id, branch_id]) 
-}
-
-model AddressBranch {
-  address_id String @id @default(uuid())
-
-  province_id String
-  district_id String
-  branch_id String
-
-  province Province @relation(fields: [province_id], references: [province_id])
-  district District @relation(fields: [district_id], references: [district_id])
-  branch   Branch   @relation(fields: [branch_id], references: [branch_id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  @@unique([province_id, district_id, branch_id]) // 🔥 กัน duplicate
+
+  @@unique([province_id, district_id, branch_id], name: "address_unique")
+  @@index([province_id])
+  @@index([district_id])
+  @@index([branch_id])
 }
 
 model Province {
@@ -434,6 +429,7 @@ model Province {
 
   districts District[]
   addressBranches AddressBranch[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -447,8 +443,11 @@ model District {
 
   branches Branch[]
   addressBranches AddressBranch[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([province_id])
 }
 
 model Branch {
@@ -459,8 +458,11 @@ model Branch {
   district District @relation(fields: [district_id], references: [district_id], onDelete: Cascade)
 
   addressBranches AddressBranch[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([district_id])
 }
 
 enum DeliveryStatus {

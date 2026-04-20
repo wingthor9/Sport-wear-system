@@ -1,18 +1,11 @@
+
+import { Role } from "@prisma/client"
+
 export const isAdmin = (role?: string) => {
-    return role === "ADMIN" || role === "STAFF"
+    return role === Role.ADMIN || role === Role.STAFF
 }
 
-// export const getRedirectPath = (role?: string) => {
-//     if (role === "ADMIN" || role === "STAFF") {
-//         return "/dashboard"
-//     }
-//     return "/auth/login"
-// }
-
-
-export type UserRole = "ADMIN" | "STAFF" 
-
-export function getRedirectPath(role: UserRole) {
+export function getRedirectPath(role: Role | undefined) {
   switch (role) {
     case "ADMIN":
       return "/dashboard"
