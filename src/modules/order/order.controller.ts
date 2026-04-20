@@ -59,8 +59,8 @@ export const orderController = {
 
     async createOrder(req: NextRequest) {
         try {
-            const body = await req.json()
-            const order = await orderService.createOrder(body)
+            const formData = await req.formData()
+            const order = await orderService.createOrder(formData)
             return successResponse(order, "Create order successfully", 201)
         } catch (error) {
             console.log(error)

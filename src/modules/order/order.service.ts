@@ -1,23 +1,47 @@
 import { prisma } from "@/lib/prisma"
-import { OrderStatus, Prisma } from "@prisma/client"
-import { CreateOrderInput } from "./order.types"
+import { OrderStatus, Prisma, PaymentStatus, DeliveryStatus, PaymentMethod } from "@prisma/client"
 import { BadRequestError, NotFoundError } from "@/utils/response"
 import { generateOrderCode } from "@/utils/generateCode"
+import { convertFileToBase64, uploadMultipleImages } from "@/utils/cloudinary"
+import { Product } from "../product/product.types"
+type OrderDetail = {
+    price: number;
+    quantity: number;
+}
 
 export const orderService = {
 
     async getOrders(options?: Prisma.OrderFindManyArgs) {
         const orders = await prisma.order.findMany({
             ...options,
+            // include: {
+            //     customer: true,
+            //     order_details: {
+            //         include: {
+            //             product: true
+            //         }
+            //     },
+            //     payment: true,
+            //     delivery: true
+            // }
             include: {
                 customer: true,
-                order_details: {
+                payment: {
                     include: {
-                        product: true
+                        order: true
                     }
                 },
-                payment: true,
-                delivery: true
+                delivery: {
+                    include: {
+                        address: {
+                            include: {
+                                province: true,
+                                district: true,
+                                branch: true
+                            }
+                        }
+                    }
+                }
             }
         })
         return orders
@@ -42,75 +66,205 @@ export const orderService = {
 
     },
 
-    async createOrder(data: CreateOrderInput) {
+    async createOrder(formData: FormData) {
         return prisma.$transaction(async (tx) => {
 
-            if (!data.order_details.length) {
-                throw new BadRequestError("Order must have at least one item")
-            }
+            /* ------------------ 1. PARSE DATA ------------------ */
 
-            // 🔍 fetch products (optimize)
-            const productIds = data.order_details.map(i => i.product_id)
+            const customer_id = formData.get("customer_id") as string
+            const method = formData.get("method") as string
+            const amount = Number(formData.get("amount"))
+            const province_id = formData.get("province_id") as string
+            const district_id = formData.get("district_id") as string
+            const branch_id = formData.get("branch_id") as string
+
+            const order_details = JSON.parse(
+                formData.get("order_details") as string
+            )
+
+            const file = formData.get("file") as File | null
+
+            /* ------------------ 2. CHECK PRODUCT ------------------ */
+
+            const productIds = order_details.map((i: Product) => i.product_id)
 
             const products = await tx.product.findMany({
                 where: { product_id: { in: productIds } }
             })
 
-            const productMap = new Map(
-                products.map(p => [p.product_id, p])
-            )
+            const productMap = new Map(products.map(p => [p.product_id, p]))
 
-            // ✅ check stock
-            for (const item of data.order_details) {
+            for (const item of order_details) {
                 const product = productMap.get(item.product_id)
 
-                if (!product) {
-                    throw new NotFoundError("Product not found")
-                }
-
+                if (!product) throw new Error("Product not found")
                 if (product.stock_qty < item.quantity) {
-                    throw new BadRequestError("Insufficient stock")
+                    throw new Error("Insufficient stock")
                 }
             }
 
-            // 💰 calculate total
-            const total_amount = data.order_details.reduce(
-                (acc, item) => acc + item.price * item.quantity,
+            const total_amount = order_details.reduce(
+                (acc: number, item: OrderDetail) => acc + item.price * item.quantity,
                 0
             )
 
-            const code = generateOrderCode()
-            // 🧾 create order
+            /* ------------------ 3. CREATE ORDER ------------------ */
+
             const order = await tx.order.create({
                 data: {
-                    customer_id: data.customer_id,
-                    order_code: code ,
+                    customer_id,
+                    order_code: generateOrderCode(),
                     total_amount,
                     status: OrderStatus.WAITING_PAYMENT,
                     order_details: {
-                        create: data.order_details
+                        create: order_details
                     }
-                },
-                include: {
-                    order_details: true
                 }
             })
 
-            // 🔁 deduct stock
-            for (const item of data.order_details) {
+            /* ------------------ 4. UPLOAD SLIP ------------------ */
+
+            let slip_url: string | undefined
+            let public_id: string | undefined
+
+            if (file) {
+                const base64 = await convertFileToBase64(file)
+                const uploaded = await uploadMultipleImages([base64], "payments")
+
+                slip_url = uploaded[0]?.url
+                public_id = uploaded[0]?.publicId
+            }
+
+            /* ------------------ 5. CREATE PAYMENT ------------------ */
+
+            const payment = await tx.payment.create({
+                data: {
+                    order_id: order.order_id,
+                    method: method as PaymentMethod,
+                    amount,
+                    slip_url,
+                    public_id,
+                    status: PaymentStatus.PENDING
+                }
+            })
+
+            /* ------------------ 6. ADDRESS UPSERT ------------------ */
+
+            const address = await tx.addressBranch.upsert({
+                where: {
+                    address_unique: {
+                        province_id,
+                        district_id,
+                        branch_id
+                    }
+                },
+                update: {},
+                create: {
+                    province_id,
+                    district_id,
+                    branch_id
+                }
+            })
+
+            /* ------------------ 7. CREATE DELIVERY ------------------ */
+
+            const delivery = await tx.delivery.create({
+                data: {
+                    order_id: order.order_id,
+                    address_id: address.address_id,
+                    status: DeliveryStatus.PENDING,
+                    provider: "Anousith Express"
+                }
+            })
+
+            /* ------------------ 8. UPDATE STOCK ------------------ */
+
+            for (const item of order_details) {
                 await tx.product.update({
                     where: { product_id: item.product_id },
                     data: {
-                        stock_qty: {
-                            decrement: item.quantity
-                        }
+                        stock_qty: { decrement: item.quantity }
                     }
                 })
             }
 
-            return order
+            return {
+                order,
+                payment,
+                delivery
+            }
         })
     },
+
+    // async createOrder(data: CreateOrderInput) {
+    //     return prisma.$transaction(async (tx) => {
+
+    //         if (!data.order_details.length) {
+    //             throw new BadRequestError("Order must have at least one item")
+    //         }
+
+    //         // 🔍 fetch products (optimize)
+    //         const productIds = data.order_details.map(i => i.product_id)
+
+    //         const products = await tx.product.findMany({
+    //             where: { product_id: { in: productIds } }
+    //         })
+
+    //         const productMap = new Map(
+    //             products.map(p => [p.product_id, p])
+    //         )
+
+    //         // ✅ check stock
+    //         for (const item of data.order_details) {
+    //             const product = productMap.get(item.product_id)
+
+    //             if (!product) {
+    //                 throw new NotFoundError("Product not found")
+    //             }
+
+    //             if (product.stock_qty < item.quantity) {
+    //                 throw new BadRequestError("Insufficient stock")
+    //             }
+    //         }
+
+    //         // 💰 calculate total
+    //         const total_amount = data.order_details.reduce(
+    //             (acc, item) => acc + item.price * item.quantity,
+    //             0
+    //         )
+
+    //         const code = generateOrderCode()
+    //         // 🧾 create order
+    //         const order = await tx.order.create({
+    //             data: {
+    //                 customer_id: data.customer_id,
+    //                 order_code: code ,
+    //                 total_amount,
+    //                 status: OrderStatus.WAITING_PAYMENT,
+    //                 order_details: {
+    //                     create: data.order_details
+    //                 }
+    //             },
+    //             include: {
+    //                 order_details: true
+    //             }
+    //         })
+
+    //         // 🔁 deduct stock
+    //         for (const item of data.order_details) {
+    //             await tx.product.update({
+    //                 where: { product_id: item.product_id },
+    //                 data: {
+    //                     stock_qty: {
+    //                         decrement: item.quantity
+    //                     }
+    //                 }
+    //             })
+    //         }
+
+    //         return order
+    //     })
+    // },
 
     async deleteOrder(id: string) {
         return prisma.$transaction(async (tx) => {

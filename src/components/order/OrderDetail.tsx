@@ -1,39 +1,90 @@
+// import { Order } from "@/modules/order/order.types"
+
+// type Props = {
+//     order?: Order
+// }
+
+// export function OrderDetail({ order }: Props) {
+//     if (!order) return <div>No data</div>
+
+//     return (
+//         <div className="space-y-4">
+
+//             <div>
+//                 <p><b>Order code:</b> {order.order_code}</p>
+//                 <p><b>Status:</b> {order.status}</p>
+//                 <p><b>Date:</b> {new Date(order.order_date).toLocaleString()}</p>
+//             </div>
+
+//             <div>
+//                 <p className="font-semibold mb-2">Items</p>
+
+//                 {order.order_details?.map((item) => (
+//                     <div
+//                         key={item.order_detail_id}
+//                         className="flex justify-between border p-2 rounded"
+//                     >
+//                         <span>{item.product?.product_name}</span>
+//                         <span>{item.quantity} x {item.price}</span>
+//                     </div>
+//                 ))}
+//             </div>
+
+//             <div className="text-right font-bold">
+//                 Total: ${order.total_amount}
+//             </div>
+
+//         </div>
+//     )
+// }
+
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Order } from "@/modules/order/order.types"
+import Image from "next/image"
 
 type Props = {
-    order?: Order
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    data: Order
 }
 
-export function OrderDetail({ order }: Props) {
-    if (!order) return <div>No data</div>
+export function OrderDetailDialog({ open, onOpenChange, data }: Props) {
+
+    if (!data) return null
 
     return (
-        <div className="space-y-4">
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-3xl">
 
-            <div>
-                <p><b>Order code:</b> {order.order_code}</p>
-                <p><b>Status:</b> {order.status}</p>
-                <p><b>Date:</b> {new Date(order.order_date).toLocaleString()}</p>
-            </div>
+                <h2 className="text-lg font-bold">Order Detail</h2>
 
-            <div>
-                <p className="font-semibold mb-2">Items</p>
+                {/* ORDER */}
+                <div>
+                    <p>Order: {data.order_code}</p>
+                    <p>Status: {data.status}</p>
+                </div>
 
-                {order.order_details?.map((item) => (
-                    <div
-                        key={item.order_detail_id}
-                        className="flex justify-between border p-2 rounded"
-                    >
-                        <span>{item.product?.product_name}</span>
-                        <span>{item.quantity} x {item.price}</span>
-                    </div>
-                ))}
-            </div>
+                {/* PAYMENT */}
+                <div>
+                    <p>Payment: {data.payment?.status}</p>
 
-            <div className="text-right font-bold">
-                Total: ${order.total_amount}
-            </div>
+                    {data.payment?.slip_url && (
+                        <Image
+                            src={data.payment.slip_url}
+                            width={200}
+                            height={200}
+                            alt="slip"
+                        />
+                    )}
+                </div>
 
-        </div>
+                {/* DELIVERY */}
+                <div>
+                    <p>Delivery: {data.delivery?.status}</p>
+                    <p>Tracking: {data.delivery?.tracking_number}</p>
+                </div>
+
+            </DialogContent>
+        </Dialog>
     )
 }

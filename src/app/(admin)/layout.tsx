@@ -17,14 +17,14 @@ type NavItem = {
 }
 
 const navigation: NavItem[] = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN", "STAFF"] },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN"] },
     { name: "Point of Sale", href: "/pos", icon: ShoppingCart, roles: ["ADMIN", "STAFF"] },
     { name: "Orders", href: "/order", icon: ShoppingBag, roles: ["ADMIN", "STAFF"] },
     { name: "Purchases", href: "/purchase", icon: ShoppingBag, roles: ["ADMIN"] },
     { name: "Imports", href: "/import", icon: ShoppingBag, roles: ["ADMIN"] },
     { name: "Payments", href: "/payment", icon: CreditCard, roles: ["ADMIN"] },
     { name: "Product", href: "/product", icon: Package, roles: ["ADMIN"] },
-    { name: "Categories", href: "/category", icon: Store, roles: ["ADMIN","STAFF"] },
+    { name: "Categories", href: "/category", icon: Store, roles: ["ADMIN"] },
     { name: "Suppliers", href: "/supplier", icon: Store, roles: ["ADMIN"] },
     { name: "Customers", href: "/customer", icon: Users, roles: ["ADMIN"] },
     { name: "Employees", href: "/employee", icon: UserCog, roles: ["ADMIN"] },
@@ -41,27 +41,20 @@ export default function AdminLayout({ children, }: { children: React.ReactNode }
     const { mutate: logout, isPending } = useAdminLogout()
     const [collapsed, setCollapsed] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
-    console.log("user : ", user.role)
 
     useEffect(() => {
         if (isLoading) return;
-
         if (!user) {
             router.replace("/login");
             return;
         }
+       const target = getRedirectPath(user.role);
 
-        getRedirectPath(user.role);
-
-        // if (pathname !== target) {
-        //     router.replace(target);
-        // }
-
+        if (pathname === "/") {
+            router.replace(target);
+        }
     }, [user, isLoading, pathname]);
     if (isLoading) return null
-
-    // console.log("user : ",user)
-
     return (
         <div className="flex h-screen bg-gray-50 ">
             {/* Sidebar */}

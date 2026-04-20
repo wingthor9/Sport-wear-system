@@ -1,6 +1,8 @@
 export const roleRoutes = {
     STAFF: [
-        "/api/sales"
+        "/api/sales",
+        "/api/order",
+
     ],
 
     CUSTOMER: [

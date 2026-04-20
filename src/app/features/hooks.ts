@@ -8,7 +8,7 @@ import { CreateEmployeeInput, UpdateEmployeeInput } from "@/modules/employee/emp
 import { Category, UpdateCategoryInput } from "@/modules/category/category.type"
 import { CreateSupplierInput, UpdateSupplierInput } from "@/modules/supplier/supplier.type"
 import { CreatePurchaseOrderInput, UpdatePurchaseOrderInput } from "@/modules/purchase/purchase.type"
-import { CreateOrderInput, UpdateOrderStatusInput } from "@/modules/order/order.types"
+import { CreateOrderInput, OrderInput, UpdateOrderStatusInput } from "@/modules/order/order.types"
 import { CreateSaleInput } from "@/modules/sale/sale.type"
 import { CreateRefundInput } from "@/modules/refund/refund.type"
 import { ForgotPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
@@ -603,9 +603,7 @@ export const useCreateOrder = () => {
     const qc = useQueryClient()
 
     return useMutation({
-        mutationFn: (data: CreateOrderInput) =>
-            orderApi.create(data),
-
+       mutationFn: orderApi.create,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["orders"] })
         }

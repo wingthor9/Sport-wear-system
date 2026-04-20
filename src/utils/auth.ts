@@ -11,9 +11,9 @@ export function getRedirectPath(role: Role | undefined) {
       return "/dashboard"
 
     case "STAFF":
-      return "/pos"
+      return "/order"
 
     default:
-      return "/"
+      return "/order"
   }
 }

@@ -7,7 +7,7 @@ import { Product } from "@/modules/product/product.types"
 import { Category, CreateCategoryInput, UpdateCategoryInput } from "@/modules/category/category.type"
 import { CreateSupplierInput, Supplier, UpdateSupplierInput } from "@/modules/supplier/supplier.type"
 import { CreatePurchaseOrderInput, PurchaseOrder, UpdatePurchaseOrderInput } from "@/modules/purchase/purchase.type"
-import { CreateOrderInput, Order, UpdateOrderStatusInput } from "@/modules/order/order.types"
+import { CreateOrderInput, Order, OrderInput, UpdateOrderStatusInput } from "@/modules/order/order.types"
 import { CreateSaleInput, Sale } from "@/modules/sale/sale.type"
 import { CreateRefundInput, Refund } from "@/modules/refund/refund.type"
 import { ForgotPasswordInput, ResetPasswordInput, VerifyOTPInput } from "@/modules/auth/auth.type"
@@ -480,9 +480,17 @@ export const orderApi = {
     return res.data.data
   },
 
-  create: async (data: CreateOrderInput): Promise<Order> => {
-    const res = await axiosInstance.post("/order", data)
-    return res.data.data
+  // create: async (data: OrderInput): Promise<Order> => {
+  //   const res = await axiosInstance.post("/order", data)
+  //   return res.data.data
+  // },
+  create: async (data: FormData): Promise<Order> => {
+    const res = await axiosInstance.post("/order", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    return res.data.data.data
   },
 
   updateStatus: async (

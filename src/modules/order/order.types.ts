@@ -1,17 +1,19 @@
 
+import { PaymentMethod } from "@prisma/client"
 import { Customer } from "../customer/customer.type"
 import { Product } from "../product/product.types"
+import { Payment } from "../payment/payment.type"
+import { Delivery } from "../delivery/delivery.type"
 
 
 
-export type OrderStatus =
-  | "PENDING"
-  | "WAITING_PAYMENT"
-  | "PAID"
-  | "SHIPPED"
-  | "COMPLETED"
-  | "CANCELLED"
-
+export enum OrderStatus {
+  WAITING_PAYMENT = "WAITING_PAYMENT",
+  PAID = "PAID",
+  SHIPPED = "SHIPPED",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED"
+}
 export type OrderDetail = {
   order_detail_id: string
   quantity: number
@@ -32,6 +34,8 @@ export type Order = {
   customer_id: string
   customer?: Customer
   order_details?: OrderDetail[]
+  payment: Payment
+  delivery: Delivery
   createdAt: string
   updatedAt: string
 }
@@ -49,4 +53,29 @@ export type CreateOrderInput = {
 
 export type UpdateOrderStatusInput = {
   status: OrderStatus
+}
+
+export type OrderInput = {
+  customer_id: string
+  order_date: string
+  order_code: string
+  status: OrderStatus
+
+  order_details: {
+    product_id: string
+    quantity: number
+    price: number
+  }[]
+
+  payment: {
+    method: PaymentMethod
+    amount: number
+    file?: File
+  }
+
+  address: {
+    province_id: string
+    district_id: string
+    branch_id: string
+  }
 }
