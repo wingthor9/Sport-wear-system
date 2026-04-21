@@ -23,6 +23,8 @@ export default function ProductsPage() {
     const [openForm, setOpenForm] = useState< boolean >(false)
     const [selectedProduct, setSelectedProduct] = useState< Product | undefined >()
 
+    console.log(data)
+
 
     const handleEdit = (product: Product) => {
         setSelectedProduct(product)

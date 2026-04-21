@@ -318,14 +318,285 @@
 //     );
 // }
 
-import React from 'react'
+"use client"
 
-const page = () => {
+import { useState } from "react"
+import { toast } from "sonner"
+import { useQueryClient } from "@tanstack/react-query"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+import { Search, Trash2, Plus, Minus, CreditCard } from "lucide-react"
+
+import { Product } from "@/modules/product/product.types"
+import { useCreateSale, useGetProducts } from "@/app/features/hooks"
+
+type CartItem = {
+  product_id: string
+  name: string
+  price: number
+  quantity: number
+  image?: string
+}
+
+type HoldOrder = {
+  id: string
+  items: CartItem[]
+}
+
+export default function POSPage() {
+  // const qc = useQueryClient()
+  const { data : products, isLoading  } = useGetProducts()
+  // const product = products?.data
+  const createSale = useCreateSale()
+
+  const [cart, setCart] = useState<CartItem[]>([])
+  const [search, setSearch] = useState("")
+  const [barcode, setBarcode] = useState("")
+  const [holds, setHolds] = useState<HoldOrder[]>([])
+  const [receiptOpen, setReceiptOpen] = useState(false)
+  console.log("product: ", products)
+
+  // ---------------- FILTER ----------------
+  const filtered = product.filter((p: Product) =>
+    p.product_name.toLowerCase().includes(search.toLowerCase()) ||
+    p.sku?.toLowerCase().includes(search.toLowerCase())
+  )
+
+  // ---------------- CART ----------------
+  const addToCart = (p: any) => {
+    setCart(prev => {
+      const exist = prev.find(i => i.product_id === p.product_id)
+
+      if (exist) {
+        return prev.map(i =>
+          i.product_id === p.product_id
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
+        )
+      }
+
+      return [
+        ...prev,
+        {
+          product_id: p.product_id,
+          name: p.product_name,
+          price: p.price,
+          quantity: 1,
+          image: p.image
+        }
+      ]
+    })
+  }
+
+  const updateQty = (id: string, d: number) => {
+    setCart(prev =>
+      prev
+        .map(i =>
+          i.product_id === id
+            ? { ...i, quantity: i.quantity + d }
+            : i
+        )
+        .filter(i => i.quantity > 0)
+    )
+  }
+
+  // ---------------- BARCODE ----------------
+  const handleBarcode = (code: string) => {
+    const p = products.find((x: any) => x.sku === code)
+    if (!p) return toast.error("Not found")
+
+    addToCart(p)
+    setBarcode("")
+  }
+
+  // ---------------- HOLD ----------------
+  const holdOrder = () => {
+    if (!cart.length) return
+
+    setHolds(prev => [...prev, { id: Date.now().toString(), items: cart }])
+    setCart([])
+  }
+
+  const restore = (h: HoldOrder) => {
+    setCart(h.items)
+    setHolds(prev => prev.filter(i => i.id !== h.id))
+  }
+
+  // ---------------- TOTAL ----------------
+  const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0)
+  const tax = subtotal * 0.08
+  const total = subtotal + tax
+
+  // ---------------- CHECKOUT ----------------
+  const checkout = async () => {
+    if (!cart.length) return
+
+    try {
+      await createSale.mutateAsync({
+        sale_details: cart.map(i => ({
+          product_id: i.product_id,
+          quantity: i.quantity,
+          price: i.price
+        }))
+      })
+
+      toast.success("Success")
+      setReceiptOpen(true)
+      setCart([])
+
+      qc.invalidateQueries(["products"])
+    } catch {
+      toast.error("Error")
+    }
+  }
+
   return (
-    <div>
-      POS
+    <div className="grid grid-cols-12 h-screen bg-gray-100">
+
+      {/* LEFT - PRODUCTS */}
+      <div className="col-span-8 flex flex-col">
+
+        {/* HEADER */}
+        <div className="p-4 bg-white border-b">
+          <h1 className="text-xl font-bold">POS System</h1>
+
+          <div className="flex gap-2 mt-2">
+            <Input
+              placeholder="Search product..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+
+            <Input
+              placeholder="Scan barcode..."
+              value={barcode}
+              onChange={e => setBarcode(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && handleBarcode(barcode)}
+            />
+          </div>
+        </div>
+
+        {/* PRODUCTS */}
+        <ScrollArea className="p-4">
+          <div className="grid grid-cols-3 gap-3">
+            {filtered.map((p: any) => (
+              <Card
+                key={p.product_id}
+                className="p-3 cursor-pointer hover:shadow-md"
+                onClick={() => addToCart(p)}
+              >
+                <img src={p.image} className="h-24 w-full object-cover rounded" />
+
+                <div className="mt-2">
+                  <p className="text-sm">{p.product_name}</p>
+                  <p className="text-blue-500">${p.price}</p>
+                </div>
+
+                <Badge className="mt-2">{p.stock_qty} stock</Badge>
+              </Card>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+
+      {/* RIGHT - CART */}
+      <div className="col-span-4 bg-white border-l flex flex-col">
+
+        <div className="p-4 border-b">
+          <h2 className="font-bold">Cart ({cart.length})</h2>
+        </div>
+
+        <ScrollArea className="flex-1 p-4">
+          {cart.map(i => (
+            <div key={i.product_id} className="border-b py-2">
+              <p className="text-sm">{i.name}</p>
+              <p className="text-blue-500">${i.price}</p>
+
+              <div className="flex gap-2 mt-2">
+                <Button size="sm" onClick={() => updateQty(i.product_id, -1)}>
+                  <Minus />
+                </Button>
+
+                <span>{i.quantity}</span>
+
+                <Button size="sm" onClick={() => updateQty(i.product_id, 1)}>
+                  <Plus />
+                </Button>
+
+                <Button size="sm" variant="destructive">
+                  <Trash2 />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </ScrollArea>
+
+        <Separator />
+
+        {/* SUMMARY */}
+        <div className="p-4 space-y-2">
+          <p>Subtotal: ${subtotal.toFixed(2)}</p>
+          <p>Tax: ${tax.toFixed(2)}</p>
+          <p className="text-xl font-bold">Total: ${total.toFixed(2)}</p>
+
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={holdOrder}>
+              Hold
+            </Button>
+
+            <Button className="flex-1" onClick={checkout}>
+              <CreditCard className="w-4 h-4 mr-2" />
+              Pay
+            </Button>
+          </div>
+        </div>
+
+        {/* HELD ORDERS */}
+        <div className="p-4 border-t">
+          <p className="text-sm font-bold">Held Orders</p>
+
+          {holds.map(h => (
+            <Button
+              key={h.id}
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => restore(h)}
+            >
+              {h.items.length} items
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* RECEIPT */}
+      <Dialog open={receiptOpen} onOpenChange={setReceiptOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Receipt</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            {cart.map(i => (
+              <div key={i.product_id} className="flex justify-between">
+                <span>{i.name}</span>
+                <span>{i.price * i.quantity}</span>
+              </div>
+            ))}
+          </div>
+
+          <Separator />
+
+          <p className="font-bold">Total: {total.toFixed(2)}</p>
+        </DialogContent>
+      </Dialog>
+
     </div>
   )
 }
-
-export default page

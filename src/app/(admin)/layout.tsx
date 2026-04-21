@@ -18,7 +18,7 @@ type NavItem = {
 
 const navigation: NavItem[] = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN"] },
-    { name: "Point of Sale", href: "/pos", icon: ShoppingCart, roles: ["ADMIN", "STAFF"] },
+    { name: "Point of Sale", href: "/POS", icon: ShoppingCart, roles: ["ADMIN", "STAFF"] },
     { name: "Orders", href: "/order", icon: ShoppingBag, roles: ["ADMIN", "STAFF"] },
     { name: "Purchases", href: "/purchase", icon: ShoppingBag, roles: ["ADMIN"] },
     { name: "Imports", href: "/import", icon: ShoppingBag, roles: ["ADMIN"] },
