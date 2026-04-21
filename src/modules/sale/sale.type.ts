@@ -41,7 +41,7 @@ export type CreateSaleDetailInput = {
 }
 
 export type CreateSaleInput = {
-    employee_id: string
+    employee_id?: string
     customer_id?: string
     sale_details: CreateSaleDetailInput[]
 }
