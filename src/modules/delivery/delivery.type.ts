@@ -39,7 +39,7 @@ export type Address = {
 
 
 export type UpdateDeliveryInput = {
-    status?: DeliveryStatus
+    status: DeliveryStatus
     tracking_number?: string
 }
 

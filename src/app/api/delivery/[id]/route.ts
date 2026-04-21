@@ -7,6 +7,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     return deliveryController.getDelivery(id)
 }
 
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
+    return deliveryController.updateDelivery(req, id)
+}
+
 // export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 //     const { id } = await params
 //     return deliveryController.deleteDelivery(id)

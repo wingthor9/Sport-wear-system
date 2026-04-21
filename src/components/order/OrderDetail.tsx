@@ -40,6 +40,7 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Order } from "@/modules/order/order.types"
+import { formatDate } from "@/utils/FormatDate"
 import Image from "next/image"
 
 type Props = {
@@ -62,6 +63,7 @@ export function OrderDetailDialog({ open, onOpenChange, data }: Props) {
                 <div>
                     <p>Order: {data.order_code}</p>
                     <p>Status: {data.status}</p>
+                    <p>Date: {formatDate(data.order_date)}</p>
                 </div>
 
                 {/* PAYMENT */}
@@ -82,6 +84,11 @@ export function OrderDetailDialog({ open, onOpenChange, data }: Props) {
                 <div>
                     <p>Delivery: {data.delivery?.status}</p>
                     <p>Tracking: {data.delivery?.tracking_number}</p>
+                </div>
+                <div>
+                    <p>Province: {data.delivery.address.province?.province_name}</p>
+                    <p>District: {data.delivery.address.district?.district_name}</p>
+                    <p>Branch: {data.delivery.address.branch?.branch_name}</p>
                 </div>
 
             </DialogContent>

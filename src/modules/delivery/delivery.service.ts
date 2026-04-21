@@ -125,13 +125,12 @@ export const deliveryService = {
             })
 
             const code = generateTrackingCode()
-
             // 5. create delivery
             return tx.delivery.create({
                 data: {
                     order_id: data.order_id,
                     address_id: address.address_id,
-                    tracking_number: code,
+                    tracking_number: generateTrackingCode(),
                     status: "PENDING",
                     provider: "Anousith Express"
                 }
@@ -144,17 +143,11 @@ export const deliveryService = {
         const delivery = await prisma.delivery.findUnique({
             where: { delivery_id: id }
         })
-
+        console.log(data)
         if (!delivery) throw new NotFoundError("Delivery not found")
-
-        if (
-            data.status === DeliveryStatus.SHIPPED &&
-            !data.tracking_number &&
-            !delivery.tracking_number
-        ) {
+        if (data.status === DeliveryStatus.SHIPPED) {
             throw new BadRequestError("Tracking number required before shipping")
         }
-
         return prisma.delivery.update({
             where: { delivery_id: id },
             data

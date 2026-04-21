@@ -108,8 +108,8 @@ import { useState } from "react"
 import { useUpdateDelivery, useVerifyPayment } from "@/app/features/hooks"
 import { toast } from "sonner"
 import { PaymentVerifyDialog } from "../payment/PaymentVerifyDialog"
-import { Delivery } from '../../modules/delivery/delivery.type';
 import { DeliveryUpdateDialog } from "./DeliveryUpdateDialog"
+import { Delivery } from "@/modules/delivery/delivery.type"
 
 type Props = {
     data: Order[]
@@ -128,8 +128,7 @@ export function OrderTable({ data, isLoading, onView }: Props) {
     const [openDialog, setOpenDialog] = useState(false)
     const [openDeliveryDialog, setOpenDeliveryDialog] = useState(false)
     const [selectedPayment, setSelectedPayment] = useState<Payment | undefined>()
-    const [selectedDelivery, setSelectedDelivery] = useState<Order | undefined>()
-
+    const [selectedDelivery, setSelectedDelivery] = useState<Delivery | undefined>()
     if (isLoading) return <div>Loading...</div>
 
     const handleVerify = (payment: Payment) => {
@@ -157,29 +156,31 @@ export function OrderTable({ data, isLoading, onView }: Props) {
 
 
 
-    const handleUpdateDeliveryDialog = (order: Order) => {
-        setSelectedDelivery(order)
+    const handleUpdateDeliveryDialog = (delivery: Delivery) => {
+        setSelectedDelivery(delivery)
         setOpenDeliveryDialog(true)
     }
-  const handleUpdateDelivery = (status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED") => {
-      if (!selectedDelivery) return
-      updateDelivery.mutate(
-          {
-              id: selectedDelivery.delivery.delivery_id,
-              data: { status } 
-          },
-          {
-              onSuccess: () => {
-                  toast.success("Delivery updated")
-                  setOpenDeliveryDialog(false)
-              },
-              onError: () => {
-                  toast.error("Update failed")
-              }
-          }
-      )
-      
-  }
+
+
+    const handleUpdateDelivery = (status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED") => {
+        if (!selectedDelivery?.delivery_id) return
+        updateDelivery.mutate(
+            {
+                id: selectedDelivery.delivery_id,
+                data: { status }
+            },
+            {
+                onSuccess: () => {
+                    toast.success("Delivery updated")
+                    setOpenDeliveryDialog(false)
+                },
+                onError: () => {
+                    toast.error("Update failed")
+                }
+            }
+        )
+
+    }
 
 
 
@@ -242,7 +243,8 @@ export function OrderTable({ data, isLoading, onView }: Props) {
                                 {/* verify payment */}
                                 <Button
                                     size="sm"
-                                    onClick={() => handleVerify(o.payment)}
+                                    onClick={() => o.payment && handleVerify(o.payment)}
+                                    disabled={o.payment?.status !== "PENDING" || !o.payment}
                                     className={
                                         o.payment?.status === "PENDING"
                                             ? "bg-yellow-500 hover:bg-yellow-600 text-white"
@@ -261,11 +263,10 @@ export function OrderTable({ data, isLoading, onView }: Props) {
                                 {/* update delivery */}
                                 <Button
                                     size="sm"
-                                    onClick={() =>
-                                        handleUpdateDeliveryDialog(o)
-                                    }
+                                    onClick={() => o.delivery && handleUpdateDeliveryDialog(o.delivery)}
+                                    disabled={!o.delivery}
                                 >
-                                    Ship
+                                    {o.delivery?.status}
                                 </Button>
 
                             </TableCell>
