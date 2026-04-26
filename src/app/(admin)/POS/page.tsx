@@ -290,26 +290,100 @@
 // }
 
 
+// "use client"
+
+
+// import { useGetProducts, useCreateSale } from "@/app/features/hooks"
+// import CartPanel from "@/components/sale/CartPanel"
+// import ProductGrid from "@/components/sale/ProductGrid"
+// import { useCart } from "@/components/sale/useCart"
+// import { Product } from "@/modules/product/product.types"
+
+// export default function POSPage() {
+//   const { data: products = [] } = useGetProducts()
+//   const product = products?.data || []
+//   const createSale = useCreateSale()
+
+//   const { cart, add, update, remove, total, clear } = useCart()
+
+//   const checkout = async () => {
+//     if (!cart.length) return
+
+//     await createSale.mutateAsync({
+//       sale_details: cart.map(i => ({
+//         product_id: i.product_id,
+//         quantity: i.quantity,
+//         price: i.price
+//       }))
+//     })
+
+//     clear()
+//   }
+
+//   return (
+//     <div className="grid grid-cols-1 md:grid-cols-12 h-screen">
+
+//       <div className="md:col-span-8 p-4">
+//         <ProductGrid
+//           products={product}
+//           onAdd={(p: Product) =>
+//             add({
+//               product_id: p.product_id,
+//               name: p.product_name,
+//               price: p.sale_price,
+//               quantity: 1,
+//               image: p.images?.[0]?.image_url
+//             })
+//           }
+//         />
+//       </div>
+
+//       <div className="md:col-span-4 border-l">
+//         <CartPanel
+//           cart={cart}
+//           update={update}
+//           remove={remove}
+//           total={total}
+//           checkout={checkout}
+//         />
+//       </div>
+
+//     </div>
+//   )
+// }
+
+
 "use client"
 
-
-import { useGetProducts, useCreateSale } from "@/app/features/hooks"
-import CartPanel from "@/components/sale/CartPanel"
-import ProductGrid from "@/components/sale/ProductGrid"
-import { useCart } from "@/components/sale/useCart"
+import { useState } from "react"
+import { useGetProducts, useCreateSale, useGetCustomers } from "@/app/features/hooks"
+import ProductGrid from "@/components/POS/ProductGrid"
+import CustomerSelect from "@/components/POS/CustomerSelect"
+import CartPanel from "@/components/POS/CartPanel"
+import ConfirmModal from "@/components/POS/ConfirmModal"
+import ReceiptModal from "@/components/POS/ReceiptModal"
+import { useCart } from "@/components/POS/useCart"
+import { Customer } from "@/modules/customer/customer.type"
 import { Product } from "@/modules/product/product.types"
 
 export default function POSPage() {
   const { data: products = [] } = useGetProducts()
   const product = products?.data || []
+  const { data: customers = [] } = useGetCustomers()
+  const customer = customers?.data || []
   const createSale = useCreateSale()
 
-  const { cart, add, update, remove, total, clear } = useCart()
+  const { cart, add, update, remove, subtotal, total, tax, clear } = useCart()
+
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>()
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [receipt, setReceipt] = useState<any>(null)
 
   const checkout = async () => {
     if (!cart.length) return
 
-    await createSale.mutateAsync({
+    const res = await createSale.mutateAsync({
+      customer_id: selectedCustomer?.customer_id || undefined,
       sale_details: cart.map(i => ({
         product_id: i.product_id,
         quantity: i.quantity,
@@ -317,37 +391,66 @@ export default function POSPage() {
       }))
     })
 
+    setReceipt({
+      items: cart,
+      total,
+      customer: selectedCustomer?.customer_name || "Walk-in",
+      date: new Date().toLocaleString()
+    })
+
     clear()
+    setShowConfirm(false)
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 h-screen">
 
-      <div className="md:col-span-8 p-4">
+      {/* LEFT - PRODUCTS */}
+      <div className="md:col-span-8 p-4 overflow-auto">
         <ProductGrid
-          products={product}
-          onAdd={(p: Product) =>
-            add({
-              product_id: p.product_id,
-              name: p.product_name,
-              price: p.sale_price,
-              quantity: 1,
-              image: p.images?.[0]?.image_url
-            })
-          }
+          products={product || []}
+          onAdd={add}
         />
       </div>
 
-      <div className="md:col-span-4 border-l">
+      {/* RIGHT - CART */}
+      <div className="md:col-span-4 border-l flex flex-col h-screen">
+
+        <div className="p-3 border-b">
+          <CustomerSelect
+            customers={customer || []}
+            selected={selectedCustomer}
+            onSelect={setSelectedCustomer || undefined}
+          />
+        </div>
+
         <CartPanel
           cart={cart}
           update={update}
           remove={remove}
+          subtotal={subtotal}
+          tax={tax}
           total={total}
-          checkout={checkout}
+          onCheckout={() => setShowConfirm(true)}
         />
       </div>
 
+      {/* MODALS */}
+      {showConfirm && (
+        <ConfirmModal
+          cart={cart}
+          total={total}
+          onConfirm={checkout}
+          onClose={() => setShowConfirm(false)}
+        />
+      )}
+
+      {receipt && (
+        <ReceiptModal
+          data={receipt}
+          onClose={() => setReceipt(null)}
+        />
+      )}
     </div>
   )
 }

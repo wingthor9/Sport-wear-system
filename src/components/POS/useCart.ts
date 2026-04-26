@@ -52,7 +52,13 @@ export const useCart = () => {
         localStorage.removeItem("pos_cart")
     }
 
-    const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0)
+    const subtotal = cart.reduce((s, i) => {
+        const price = Number(i.price) || 0
+        const qty = Number(i.quantity) || 0
+
+        return s + price * qty
+    }, 0)
+
     const tax = subtotal * 0.08
     const total = subtotal + tax
 
